@@ -1,0 +1,19 @@
+let question = input.args()[0] ?? input.prompt("Ask me anything:")
+
+# 连接知识库（模拟）
+kb.connect("local", { path: "./kb" })
+let references = kb.search(question, top_k=3)
+
+# 构造提示
+let prompt = """
+Context: {{refs}}
+Question: {{q}}
+Answer concisely based on context.
+"""
+
+# 调用 LLM（模拟）
+llm.new({ provider: "anthropic", model: "claude-3" })
+let answer = llm.prompt(prompt, { refs: references, q: question })
+
+print(answer)
+output.file("answer.txt", answer)

@@ -1,0 +1,77 @@
+let name = "Alice"
+let count = 10
+let items = [1, 2, 3]
+let config = { "timeout": 30, "retry": true }
+
+print("=== Basic Variables ===")
+print("Name: " + name)
+print("Count: " + str(count))
+print("Items: " + str(items))
+print("Config: " + str(config))
+
+print("\n=== Types ===")
+print("Type of name: " + type(name))
+print("Type of count: " + type(count))
+print("Type of items: " + type(items))
+
+print("\n=== Operations ===")
+let x = 10
+let y = 5
+print("10 + 5 = " + str(x + y))
+print("10 - 5 = " + str(x - y))
+print("10 * 5 = " + str(x * y))
+print("10 / 5 = " + str(x / y))
+print("10 ** 2 = " + str(x ** 2))
+print("10 % 3 = " + str(x % 3))
+
+print("\n=== Conditionals ===")
+if count >= 10 {
+    print("Count is >= 10")
+} else {
+    print("Count is < 10")
+}
+
+let level = if count >= 10 then "high" else "low"
+print("Level: " + level)
+
+print("\n=== Loops ===")
+for i in range(3) {
+    print("i = " + str(i))
+}
+
+for item in items {
+    print("Item: " + str(item))
+}
+
+print("\n=== Functions ===")
+function add(a, b) {
+    return a + b
+}
+let result = add(3, 5)
+print("add(3, 5) = " + str(result))
+
+function greet(name) -> string {
+    return "Hello, " + name + "!"
+}
+print(greet("World"))
+
+print("\n=== Error Handling ===")
+try {
+    let resp = api.call("GET", "https://api.example.com")
+    print("API status: " + str(resp.status))
+} catch error {
+    print("Error: " + error)
+} finally {
+    print("Cleanup done")
+}
+
+print("\n=== Tests ===")
+test "should add correctly" {
+    assert add(2, 3) == 5
+}
+
+test "should handle strings" {
+    assert "hello" + " world" == "hello world"
+}
+
+print("\nAll tests passed!")

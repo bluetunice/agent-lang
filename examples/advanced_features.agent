@@ -1,0 +1,131 @@
+# AFL 高级功能演示
+# 展示 v1.3+ 的新特性和已修复的功能
+
+print("=== AFL 高级功能演示 ===\n")
+
+## 1. 变量重新赋值
+print("--- 1. 变量重新赋值 ---")
+let counter = 0
+counter = counter + 1
+counter = counter + 1
+counter = counter + 1
+assert counter == 3
+print("counter = " + str(counter))
+
+## 2. 字典修改
+print("\n--- 2. 字典修改 ---")
+let user = { "name": "Alice", "age": 25 }
+user["age"] = 26
+user["city"] = "Beijing"
+assert user["age"] == 26
+assert user["city"] == "Beijing"
+print("user: " + str(user))
+
+## 3. 列表索引和操作
+print("\n--- 3. 列表操作 ---")
+let items = [10, 20, 30]
+items[0] = 15
+assert items[0] == 15
+append(items, 40)
+assert len(items) == 4
+let last = pop(items)
+assert last == 40
+print("items: " + str(items))
+
+## 4. ?? 空值合并运算符
+print("\n--- 4. ?? 空值合并 ---")
+let name = null
+let display = name ?? "Guest"
+assert display == "Guest"
+let direct = "hello" ?? "fallback"
+assert direct == "hello"
+print("display: " + display)
+
+## 5. in 成员运算符
+print("\n--- 5. in 成员运算符 ---")
+assert 3 in [1, 2, 3, 4, 5]
+assert "he" in "hello world"
+let dict = { "a": 1, "b": 2 }
+assert "a" in dict
+assert not ("z" in dict)
+print("in 运算符测试通过")
+
+## 6. JSON 处理
+print("\n--- 6. JSON 处理 ---")
+let obj = { "name": "test", "value": 42 }
+let json_str = json(obj)
+assert type(json_str) == "str"
+let parsed = json(json_str)
+assert parsed["name"] == "test"
+assert parsed["value"] == 42
+print("JSON: " + json_str)
+
+## 7. 类型检查
+print("\n--- 7. 类型检查 ---")
+assert type(null) == "NoneType"
+assert type("hello") == "str"
+assert type(42) == "int"
+assert type(3.14) == "float"
+assert type(true) == "bool"
+assert type([1, 2]) == "list"
+assert type({ "a": 1 }) == "dict"
+print("类型检查测试通过")
+
+## 8. 函数默认参数
+print("\n--- 8. 函数默认参数 ---")
+function greet(name, greeting="Hello") -> string {
+    return greeting + ", " + name + "!"
+}
+assert greet("World") == "Hello, World!"
+assert greet("Bob", greeting="Hi") == "Hi, Bob!"
+print("默认参数测试通过")
+
+## 9. else if 链
+print("\n--- 9. else if 链 ---")
+let score = 75
+let grade = ""
+if score >= 90 {
+    grade = "A"
+} else if score >= 80 {
+    grade = "B"
+} else if score >= 70 {
+    grade = "C"
+} else {
+    grade = "D"
+}
+assert grade == "C"
+print("grade: " + grade)
+
+## 10. 系统命令
+print("\n--- 10. 系统命令 ---")
+print("Platform: " + cmd.platform.system + " " + cmd.platform.release)
+print("Python: " + cmd.platform.python)
+let result = cmd.run("echo hello")
+assert result.exit_code == 0
+assert "hello" in result.stdout
+print("Cmd.run 测试通过")
+
+## 11. 日志模块
+print("\n--- 11. 日志模块 ---")
+log.info("This is an info message")
+log.warn("This is a warning")
+print("日志测试通过")
+
+## 12. 测试框架
+print("\n--- 12. 测试框架 ---")
+suite "Feature Tests" {
+    test "addition works" {
+        assert 2 + 3 == 5
+    }
+    test "string concat" {
+        assert "Hello, " + "World!" == "Hello, World!"
+    }
+    test "null handling" {
+        let x = null
+        assert x == null
+        assert (x ?? "default") == "default"
+    }
+}
+test.run("Feature Tests")
+
+print("\n=== 所有演示通过！===")

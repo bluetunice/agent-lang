@@ -1,0 +1,58 @@
+# 基础功能测试
+
+print("=== 基础变量测试 ===")
+
+# 变量声明
+let name = "Alice"
+let count = 10
+let rate = 3.14
+let active = true
+let items = [1, 2, 3]
+let config = { "timeout": 30, "retry": true }
+let empty = null
+
+print("name: " + name)
+print("count: " + str(count))
+print("rate: " + str(rate))
+print("active: " + str(active))
+print("items: " + str(items))
+print("config: " + str(config))
+print("empty: " + str(empty))
+
+print("\n=== 类型检查 ===")
+print("type(name): " + type(name))
+print("type(count): " + type(count))
+print("type(rate): " + type(rate))
+print("type(active): " + type(active))
+print("type(items): " + type(items))
+print("type(config): " + type(config))
+print("type(empty): " + type(empty))
+
+print("\n=== 运算符测试 ===")
+let a = 10
+let b = 5
+print("a + b = " + str(a + b))
+print("a - b = " + str(a - b))
+print("a * b = " + str(a * b))
+print("a / b = " + str(a / b))
+print("a ** 2 = " + str(a ** 2))
+print("a % 3 = " + str(a % 3))
+
+print("\n=== 比较运算 ===")
+print("a > b: " + str(a > b))
+print("a >= b: " + str(a >= b))
+print("a < b: " + str(a < b))
+print("a <= b: " + str(a <= b))
+print("a == 10: " + str(a == 10))
+print("a != b: " + str(a != b))
+
+print("\n=== 逻辑运算 ===")
+print("true and true: " + str(true and true))
+print("true or false: " + str(true or false))
+print("not false: " + str(not false))
+
+print("\n=== 字符串拼接 ===")
+let greeting = "Hello, " + name + "!"
+print(greeting)
+
+print("\n=== 所有基础测试完成 ===")

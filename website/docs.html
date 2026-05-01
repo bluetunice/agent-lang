@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AFL 文档 - AgentFlow Language v1.5</title>
+  <meta name="description" content="AgentFlow Language (AFL) 完整文档 - 语法参考、内置函数、模块系统">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='url(%23g)'/><defs><linearGradient id='g' x1='0' y1='0' x2='32' y2='32'><stop offset='0%25' stop-color='%233b82f6'/><stop offset='100%25' stop-color='%238b5cf6'/></linearGradient></defs><text x='16' y='23' text-anchor='middle' font-size='18' font-weight='bold' fill='white'>A</text></svg>">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">A</span>
+        AgentFlow
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="docs.html" class="active">Docs</a></li>
+        <li><a href="playground.html">Playground</a></li>
+        <li><span class="nav-version">v1.6</span></li>
+      </ul>
+      <button class="mobile-menu-btn">☰</button>
+    </div>
+  </nav>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <h4>入门</h4>
+      <a href="#overview">概述</a>
+      <a href="#install">安装与运行</a>
+      <a href="#syntax-basics">基础语法</a>
+
+      <h4>语法参考</h4>
+      <a href="#variables">变量与类型</a>
+      <a href="#operators">运算符</a>
+      <a href="#control-flow">控制流</a>
+      <a href="#loops">循环</a>
+      <a href="#functions">函数</a>
+      <a href="#error-handling">错误处理</a>
+
+      <h4>内置模块</h4>
+      <a href="#module-cmd">系统命令 (cmd)</a>
+      <a href="#module-api">网络请求 (api)</a>
+      <a href="#module-llm">LLM 调用 (llm)</a>
+      <a href="#module-kb">知识库 (kb)</a>
+      <a href="#module-mcp">MCP 协议 (mcp)</a>
+      <a href="#module-skill">Skill 技能系统 (skill)</a>
+      <a href="#module-log">日志 (log)</a>
+      <a href="#module-io">输入输出 (input/output)</a>
+
+      <h4>高级特性</h4>
+      <a href="#async">异步与并发</a>
+      <a href="#modules">模块系统</a>
+      <a href="#testing">测试框架</a>
+
+      <h4>参考</h4>
+      <a href="#builtins">内置函数大全</a>
+      <a href="#keywords">保留字</a>
+    </aside>
+
+    <!-- Content -->
+    <main class="docs-content">
+
+      <h1 id="overview">AFL 语言文档</h1>
+      <p>AgentFlow Language (AFL) v1.6 &mdash; 专为 Agent 开发设计的领域特定语言。</p>
+
+      <div class="note">
+        <strong>v1.6 更新:</strong> 新增 425 个 Python 单元测试，全面覆盖词法分析、语法解析、AST 节点、解释器及 CLI 全链路。同时修复了词法分析列号计数、逻辑运算符转换、模块导入查找、高阶函数传参、正则替换参数顺序等 6 项 bug。运行 <code>python3 -m pytest tests/ -v</code> 查看完整测试报告。
+      </div>
+
+      <!-- ===== 安装与运行 ===== -->
+      <h2 id="install">安装与运行</h2>
+
+      <p>AFL 解释器使用纯 Python 实现，无第三方依赖。</p>
+
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>终端</span></div>
+        <pre class="code-body"><span class="cm"># 运行 .agent 文件</span>
+python3 afl_lang/agent.py examples/hello.agent
+
+<span class="cm"># REPL 交互模式</span>
+python3 afl_lang/agent.py repl
+
+<span class="cm"># Python API</span>
+<span class="kw">from</span> afl_lang <span class="kw">import</span> run_agent, run_file
+
+run_agent(<span class="str">'print("Hello, World!")'</span>)
+run_file(<span class="str">"examples/hello.agent"</span>)</pre>
+      </div>
+
+      <!-- ===== 基础语法 ===== -->
+      <h2 id="syntax-basics">基础语法</h2>
+      <p>AFL 采用类 Python 的花括号语法，支持 <code>#</code> 注释。</p>
+
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>basic.agent</span></div>
+        <pre class="code-body"><span class="kw">let</span> name = <span class="str">"Alice"</span>
+<span class="kw">let</span> count = <span class="num">10</span>
+<span class="fn">print</span>(<span class="str">"Hello, "</span> + name)
+
+<span class="cm"># 输入输出</span>
+<span class="kw">let</span> q = input.<span class="fn">prompt</span>(<span class="str">"Ask: "</span>)
+output.<span class="fn">file</span>(<span class="str">"result.txt"</span>, q)</pre>
+      </div>
+
+      <!-- ===== 变量与类型 ===== -->
+      <h2 id="variables">变量与类型</h2>
+      <p>AFL 支持动态类型，自动类型推断，也支持显式类型注解。</p>
+
+      <h3>基础类型</h3>
+      <table>
+        <tr><th>类型</th><th>说明</th><th>示例</th></tr>
+        <tr><td><code>string</code></td><td>字符串</td><td><code>"hello"</code>, <code>'world'</code></td></tr>
+        <tr><td><code>number</code></td><td>数值（整数/浮点数）</td><td><code>42</code>, <code>3.14</code></td></tr>
+        <tr><td><code>boolean</code></td><td>布尔值</td><td><code>true</code>, <code>false</code></td></tr>
+        <tr><td><code>null</code></td><td>空值</td><td><code>null</code></td></tr>
+        <tr><td><code>list</code></td><td>有序列表</td><td><code>[1, 2, 3]</code></td></tr>
+        <tr><td><code>dict</code></td><td>键值对</td><td><code>{"key": "value"}</code></td></tr>
+      </table>
+
+      <h3>类型注解</h3>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>类型注解示例</span></div>
+        <pre class="code-body"><span class="kw">let</span> name: <span class="tp">string</span> = <span class="str">"Alice"</span>
+<span class="kw">let</span> count: <span class="tp">number</span> = <span class="num">10</span>
+<span class="kw">let</span> items: <span class="tp">list</span> = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+<span class="kw">let</span> config: <span class="tp">dict</span> = { timeout: <span class="num">30</span>, retry: <span class="kw">true</span> }
+
+<span class="cm"># 运行时类型检查</span>
+<span class="kw">if</span> <span class="fn">type</span>(config) == <span class="str">"dict"</span> {
+    <span class="kw">let</span> timeout = config.timeout
+}
+
+<span class="cm"># 类型转换</span>
+<span class="kw">let</span> num = <span class="fn">int</span>(<span class="str">"42"</span>)
+<span class="kw">let</span> str = <span class="fn">str</span>(<span class="num">123</span>)</pre>
+      </div>
+
+      <h3>变量重新赋值</h3>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>赋值示例</span></div>
+        <pre class="code-body"><span class="kw">let</span> x = <span class="num">10</span>
+x = x + <span class="num">5</span>              <span class="cm"># 重新赋值</span>
+
+<span class="kw">let</span> items = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+items[<span class="num">0</span>] = <span class="num">100</span>            <span class="cm"># 修改列表</span>
+
+<span class="kw">let</span> config = { key: <span class="str">"old"</span> }
+config[<span class="str">"key"</span>] = <span class="str">"new"</span>      <span class="cm"># 修改字典</span></pre>
+      </div>
+
+      <!-- ===== 运算符 ===== -->
+      <h2 id="operators">运算符</h2>
+      <table>
+        <tr><th>类别</th><th>运算符</th></tr>
+        <tr><td>算术</td><td><code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>%</code> <code>**</code></td></tr>
+        <tr><td>比较</td><td><code>==</code> <code>!=</code> <code>&lt;</code> <code>&gt;</code> <code>&lt;=</code> <code>&gt;=</code></td></tr>
+        <tr><td>逻辑</td><td><code>and</code> <code>or</code> <code>not</code></td></tr>
+        <tr><td>字符串</td><td><code>+</code> (拼接)</td></tr>
+        <tr><td>成员</td><td><code>in</code> (包含检查)</td></tr>
+        <tr><td>空值合并</td><td><code>??</code> (左值非 null 则取左，否则取右)</td></tr>
+        <tr><td>索引</td><td><code>obj[index]</code> <code>dict["key"]</code></td></tr>
+        <tr><td>三元</td><td><code>if cond then expr else expr</code></td></tr>
+      </table>
+
+      <!-- ===== 控制流 ===== -->
+      <h2 id="control-flow">控制流</h2>
+
+      <h3>if / else if / else</h3>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>if.agent</span></div>
+        <pre class="code-body"><span class="kw">if</span> score >= <span class="num">90</span> {
+    <span class="fn">print</span>(<span class="str">"A"</span>)
+} <span class="kw">else</span> <span class="kw">if</span> score >= <span class="num">80</span> {
+    <span class="fn">print</span>(<span class="str">"B"</span>)
+} <span class="kw">else</span> {
+    <span class="fn">print</span>(<span class="str">"C"</span>)
+}
+
+<span class="cm"># 三元表达式</span>
+<span class="kw">let</span> level = <span class="kw">if</span> score >= <span class="num">60</span> <span class="kw">then</span> <span class="str">"pass"</span> <span class="kw">else</span> <span class="str">"fail"</span></pre>
+      </div>
+
+      <!-- ===== 循环 ===== -->
+      <h2 id="loops">循环</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>loop.agent</span></div>
+        <pre class="code-body"><span class="cm"># for-range 循环</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>) {
+    <span class="fn">print</span>(i)
+}
+
+<span class="cm"># for-in 列表</span>
+<span class="kw">for</span> item <span class="kw">in</span> [<span class="str">"a"</span>, <span class="str">"b"</span>, <span class="str">"c"</span>] {
+    <span class="fn">print</span>(item)
+}
+
+<span class="cm"># while 循环</span>
+<span class="kw">let</span> x = <span class="num">5</span>
+<span class="kw">while</span> x > <span class="num">0</span> {
+    x = x - <span class="num">1</span>
+}
+
+<span class="cm"># break / continue</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>) {
+    <span class="kw">if</span> i >= <span class="num">5</span> { <span class="kw">break</span> }
+    <span class="kw">if</span> i % <span class="num">2</span> == <span class="num">0</span> { <span class="kw">continue</span> }
+    <span class="fn">print</span>(i)
+}</pre>
+      </div>
+
+      <!-- ===== 函数 ===== -->
+      <h2 id="functions">函数</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>function.agent</span></div>
+        <pre class="code-body"><span class="cm"># 基本函数</span>
+<span class="kw">function</span> <span class="fn">add</span>(a, b) {
+    <span class="kw">return</span> a + b
+}
+
+<span class="cm"># 带返回类型声明</span>
+<span class="kw">function</span> <span class="fn">greet</span>(name) -> <span class="tp">string</span> {
+    <span class="kw">return</span> <span class="str">"Hello, "</span> + name + <span class="str">"!"</span>
+}
+
+<span class="cm"># 默认参数值</span>
+<span class="kw">function</span> <span class="fn">connect</span>(host, port=<span class="num">8080</span>, timeout=<span class="num">30</span>) {
+    <span class="fn">print</span>(host + <span class="str">":"</span> + <span class="fn">str</span>(port))
+}
+
+<span class="cm"># 关键字参数</span>
+<span class="fn">connect</span>(<span class="str">"localhost"</span>, timeout=<span class="num">60</span>)
+
+<span class="cm"># 递归</span>
+<span class="kw">function</span> <span class="fn">factorial</span>(n) {
+    <span class="kw">if</span> n <= <span class="num">1</span> { <span class="kw">return</span> <span class="num">1</span> }
+    <span class="kw">return</span> n * <span class="fn">factorial</span>(n - <span class="num">1</span>)
+}
+
+<span class="fn">print</span>(<span class="fn">factorial</span>(<span class="num">5</span>))  <span class="cm"># 120</span></pre>
+      </div>
+
+      <!-- ===== 错误处理 ===== -->
+      <h2 id="error-handling">错误处理</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>try-catch.agent</span></div>
+        <pre class="code-body"><span class="kw">try</span> {
+    <span class="kw">let</span> resp = api.<span class="fn">call</span>(<span class="str">"GET"</span>, <span class="str">"https://api.example.com"</span>)
+    <span class="kw">if</span> resp.status == <span class="num">200</span> {
+        <span class="fn">print</span>(<span class="str">"Success"</span>)
+    } <span class="kw">else</span> {
+        <span class="kw">throw</span> <span class="str">"HTTP "</span> + resp.status
+    }
+} <span class="kw">catch</span> error {
+    log.<span class="fn">error</span>(<span class="str">"Request failed: "</span> + error)
+} <span class="kw">finally</span> {
+    <span class="fn">print</span>(<span class="str">"cleanup"</span>)
+}
+
+<span class="cm"># 断言</span>
+assert <span class="fn">add</span>(<span class="num">2</span>, <span class="num">3</span>) == <span class="num">5</span>
+assert_eq(<span class="fn">len</span>(items), <span class="num">3</span>)</pre>
+      </div>
+
+      <!-- ===== 内置模块 ===== -->
+
+      <h2 id="module-cmd">系统命令 (cmd)</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>cmd.agent</span></div>
+        <pre class="code-body"><span class="kw">let</span> result = cmd.<span class="fn">run</span>(<span class="str">"ls -la"</span>, timeout=<span class="num">10</span>)
+<span class="fn">print</span>(result.stdout)
+<span class="fn">print</span>(result.exit_code)
+
+<span class="cm"># 平台信息</span>
+<span class="fn">print</span>(cmd.platform.system)    <span class="cm"># "Darwin" / "Linux"</span>
+<span class="fn">print</span>(cmd.platform.python)    <span class="cm"># "3.9.6"</span>
+
+<span class="cm"># 工具检查</span>
+<span class="kw">if</span> cmd.<span class="fn">exists</span>(<span class="str">"git"</span>) {
+    <span class="fn">print</span>(cmd.<span class="fn">version</span>(<span class="str">"git"</span>))
+}</pre>
+      </div>
+
+      <h2 id="module-api">网络请求 (api)</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>api.agent</span></div>
+        <pre class="code-body"><span class="cm"># GET 请求</span>
+<span class="kw">let</span> resp = api.<span class="fn">get</span>(<span class="str">"https://api.example.com/data"</span>)
+<span class="fn">print</span>(resp.status)
+<span class="fn">print</span>(resp.<span class="fn">json</span>())
+
+<span class="cm"># POST 请求</span>
+<span class="kw">let</span> result = api.<span class="fn">post</span>(<span class="str">"https://api.example.com/users"</span>, {
+    body: { name: <span class="str">"Alice"</span> },
+    headers: { Authorization: <span class="str">"Bearer token123"</span> },
+    timeout: <span class="num">30</span>
+})
+
+<span class="cm"># 通用 HTTP 调用</span>
+api.<span class="fn">call</span>(<span class="str">"GET"</span>, url, { params: { page: <span class="num">1</span> } })</pre>
+      </div>
+
+      <h2 id="module-llm">LLM 调用 (llm)</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>llm.agent</span></div>
+        <pre class="code-body"><span class="cm"># 初始化</span>
+llm.<span class="fn">new</span>({ provider: <span class="str">"openai"</span>, model: <span class="str">"gpt-4"</span>, temperature: <span class="num">0.7</span> })
+
+<span class="cm"># 对话</span>
+<span class="kw">let</span> response = llm.<span class="fn">chat</span>([
+    { role: <span class="str">"system"</span>, content: <span class="str">"You are a helpful assistant."</span> },
+    { role: <span class="str">"user"</span>, content: <span class="str">"What is the capital of France?"</span> }
+])
+<span class="fn">print</span>(response.content)
+
+<span class="cm"># 提示模板</span>
+<span class="kw">let</span> answer = llm.<span class="fn">prompt</span>(<span class="str">"Summarize: {{text}}"</span>, { text: long_text })</pre>
+      </div>
+
+      <h2 id="module-kb">知识库 (kb)</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>kb.agent</span></div>
+        <pre class="code-body"><span class="cm"># 连接知识库</span>
+kb.<span class="fn">connect</span>(<span class="str">"local"</span>, { path: <span class="str">"./kb"</span> })
+
+<span class="cm"># 添加文档</span>
+kb.<span class="fn">add</span>(documents, embeddings)
+
+<span class="cm"># 语义检索</span>
+<span class="kw">let</span> chunks = kb.<span class="fn">search</span>(<span class="str">"How to reset password?"</span>, top_k=<span class="num">5</span>, min_score=<span class="num">0.7</span>)
+
+<span class="cm"># 结果直接注入 LLM 提示</span>
+<span class="kw">let</span> answer = llm.<span class="fn">prompt</span>(<span class="str">"Based on: {{ctx}}\nQuestion: {{q}}"</span>, {
+    ctx: chunks,
+    q: question
+})</pre>
+      </div>
+
+      <h2 id="module-mcp">MCP 协议 (mcp)</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>mcp.agent</span></div>
+        <pre class="code-body"><span class="cm"># 连接 MCP 服务器</span>
+mcp.<span class="fn">connect</span>(<span class="str">"http://localhost:8080"</span>)
+
+<span class="cm"># 列出可用工具</span>
+<span class="kw">let</span> tools = mcp.<span class="fn">list_tools</span>()
+
+<span class="cm"># 调用工具</span>
+<span class="kw">let</span> weather = mcp.<span class="fn">call_tool</span>(<span class="str">"get_weather"</span>, { city: <span class="str">"Beijing"</span> })
+<span class="fn">print</span>(weather)</pre>
+      </div>
+
+      <h2 id="module-skill">Skill 技能系统 (skill)</h2>
+      <p>内置预设技能库（math、text、data），开箱即用；支持从 <code>.agent</code>/<code>.afl</code> 文件导入。</p>
+
+      <table>
+        <tr><th>方法</th><th>说明</th></tr>
+        <tr><td><code>skill.load(name)</code></td><td>导入 skill（预设名或文件路径）</td></tr>
+        <tr><td><code>skill.run(name, opts)</code></td><td>运行 skill，opts = { action, ...params }</td></tr>
+        <tr><td><code>skill.list()</code></td><td>列出已导入 skills</td></tr>
+        <tr><td><code>skill.&lt;name&gt;.&lt;method&gt;(...)</code></td><td>点号直接调用 skill 方法</td></tr>
+        <tr><td><code>skill["&lt;name&gt;"].&lt;method&gt;(...)</code></td><td>方括号访问 skill</td></tr>
+      </table>
+
+      <h3>math 预设 skill</h3>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>math 方法一览</span></div>
+        <pre class="code-body">skill.math.<span class="fn">add</span>(a, b)          <span class="cm"># 加法</span>
+skill.math.<span class="fn">subtract</span>(a, b)     <span class="cm"># 减法</span>
+skill.math.<span class="fn">multiply</span>(a, b)     <span class="cm"># 乘法</span>
+skill.math.<span class="fn">divide</span>(a, b)       <span class="cm"># 除法（b=0 返回 null）</span>
+skill.math.<span class="fn">abs</span>(a)            <span class="cm"># 绝对值</span>
+skill.math.<span class="fn">floor</span>(a)          <span class="cm"># 向下取整</span>
+skill.math.<span class="fn">ceil</span>(a)           <span class="cm"># 向上取整</span>
+skill.math.<span class="fn">round</span>(a, n)       <span class="cm"># 四舍五入</span>
+skill.math.<span class="fn">sum</span>(...)          <span class="cm"># 求和</span>
+skill.math.<span class="fn">avg</span>(...)          <span class="cm"># 平均值</span>
+skill.math.<span class="fn">sqrt</span>(a)          <span class="cm"># 平方根</span>
+skill.math.<span class="fn">pow</span>(a, b)         <span class="cm"># 幂运算</span>
+skill.math.<span class="fn">min</span>(...)          <span class="cm"># 最小值</span>
+skill.math.<span class="fn">max</span>(...)          <span class="cm"># 最大值</span>
+skill.math.<span class="fn">clamp</span>(v, lo, hi) <span class="cm"># 限制范围</span></pre>
+      </div>
+
+      <h3>text 预设 skill</h3>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>text 方法一览</span></div>
+        <pre class="code-body">skill.text.<span class="fn">upper</span>(s)             <span class="cm"># 转大写</span>
+skill.text.<span class="fn">lower</span>(s)             <span class="cm"># 转小写</span>
+skill.text.<span class="fn">trim</span>(s)              <span class="cm"># 去除首尾空白</span>
+skill.text.<span class="fn">replace</span>(s, old, new) <span class="cm"># 替换</span>
+skill.text.<span class="fn">split</span>(s, sep)         <span class="cm"># 分割字符串</span>
+skill.text.<span class="fn">join</span>(items, sep)     <span class="cm"># 拼接数组</span>
+skill.text.<span class="fn">contains</span>(s, sub)      <span class="cm"># 包含检查</span>
+skill.text.<span class="fn">length</span>(s)            <span class="cm"># 字符串长度</span>
+skill.text.<span class="fn">substring</span>(s, start, end) <span class="cm"># 截取子串</span>
+skill.text.<span class="fn">reverse</span>(s)           <span class="cm"># 反转字符串</span>
+skill.text.<span class="fn">pad_left</span>(s, w, c)     <span class="cm"># 左侧填充</span>
+skill.text.<span class="fn">pad_right</span>(s, w, c)    <span class="cm"># 右侧填充</span>
+skill.text.<span class="fn">count</span>(s, sub)         <span class="cm"># 计数子串</span>
+skill.text.<span class="fn">find</span>(s, sub)          <span class="cm"># 查找位置</span>
+skill.text.<span class="fn">capitalize</span>(s)         <span class="cm"># 首字母大写</span></pre>
+      </div>
+
+      <h3>data 预设 skill</h3>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>data 方法一览</span></div>
+        <pre class="code-body">skill.data.<span class="fn">get</span>(d, key, default)  <span class="cm"># 安全获取</span>
+skill.data.<span class="fn">keys</span>(d)              <span class="cm"># 取所有 key</span>
+skill.data.<span class="fn">values</span>(d)            <span class="cm"># 取所有 value</span>
+skill.data.<span class="fn">items</span>(d)             <span class="cm"># 转 [key,value] 列表</span>
+skill.data.<span class="fn">flatten</span>(lst)          <span class="cm"># 展平嵌套列表</span>
+skill.data.<span class="fn">unique</span>(lst)          <span class="cm"># 去重（保持顺序）</span>
+skill.data.<span class="fn">sort</span>(lst, reverse)   <span class="cm"># 排序</span>
+skill.data.<span class="fn">first</span>(lst)            <span class="cm"># 取第一个元素</span>
+skill.data.<span class="fn">last</span>(lst)             <span class="cm"># 取最后一个元素</span>
+skill.data.<span class="fn">chunk</span>(lst, n)         <span class="cm"># 分块</span>
+skill.data.<span class="fn">merge</span>(...)            <span class="cm"># 合并多个字典</span>
+skill.data.<span class="fn">pick</span>(d, ...)           <span class="cm"># 选取指定 key</span>
+skill.data.<span class="fn">omit</span>(d, ...)           <span class="cm"># 排除指定 key</span></pre>
+      </div>
+
+      <h3>文件 skill 导入</h3>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>file-skill.agent</span></div>
+        <pre class="code-body"><span class="cm"># 导入本地 .agent/.afl 文件作为 skill</span>
+skill.<span class="fn">load</span>(<span class="str">"examples/string_utils.afl"</span>)
+
+<span class="cm"># 调用方法</span>
+<span class="kw">let</span> titled = skill[<span class="str">"examples/string_utils.afl"</span>].<span class="fn">title_case</span>(<span class="str">"hello world"</span>)
+<span class="fn">print</span>(titled)
+
+<span class="cm"># 运行时执行</span>
+<span class="kw">let</span> result = skill.<span class="fn">run</span>(<span class="str">"math"</span>, { action: <span class="str">"add"</span>, a: <span class="num">100</span>, b: <span class="num">200</span> })</pre>
+      </div>
+
+      <h2 id="module-log">日志 (log)</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>log.agent</span></div>
+        <pre class="code-body">log.<span class="fn">info</span>(<span class="str">"System initialized"</span>)
+log.<span class="fn">debug</span>(<span class="str">"Variable x = "</span> + <span class="fn">str</span>(x))
+log.<span class="fn">warn</span>(<span class="str">"Deprecated API called"</span>)
+log.<span class="fn">error</span>(<span class="str">"Connection timeout"</span>)</pre>
+      </div>
+
+      <h2 id="module-io">输入输出 (input/output)</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>io.agent</span></div>
+        <pre class="code-body"><span class="cm"># 输入</span>
+<span class="kw">let</span> args = input.<span class="fn">args</span>()            <span class="cm"># 命令行参数</span>
+<span class="kw">let</span> name = input.<span class="fn">prompt</span>(<span class="str">"Your name:"</span>)  <span class="cm"># 交互输入</span>
+<span class="kw">let</span> home = input.<span class="fn">env</span>(<span class="str">"HOME"</span>)      <span class="cm"># 环境变量</span>
+<span class="kw">let</span> data = input.<span class="fn">file</span>(<span class="str">"data.json"</span>) <span class="cm"># 文件读取</span>
+
+<span class="cm"># 输出</span>
+<span class="fn">print</span>(<span class="str">"Hello"</span>)                    <span class="cm"># 标准输出</span>
+output.<span class="fn">file</span>(<span class="str">"result.txt"</span>, content)  <span class="cm"># 写入文件</span></pre>
+      </div>
+
+      <!-- ===== 异步 ===== -->
+      <h2 id="async">异步与并发</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>async.agent</span></div>
+        <pre class="code-body"><span class="cm"># 异步执行</span>
+<span class="kw">async</span> {
+    <span class="kw">let</span> result = <span class="kw">await</span> llm.<span class="fn">prompt</span>(<span class="str">"Hello"</span>)
+    <span class="fn">print</span>(result)
+}
+
+<span class="cm"># 并行执行</span>
+<span class="kw">parallel</span> {
+    <span class="kw">let</span> a = api.<span class="fn">call</span>(<span class="str">"GET"</span>, <span class="str">"https://api1.example.com"</span>)
+    <span class="kw">let</span> b = api.<span class="fn">call</span>(<span class="str">"GET"</span>, <span class="str">"https://api2.example.com"</span>)
+}
+<span class="kw">wait</span>(all)  <span class="cm"># 等待所有完成</span></pre>
+      </div>
+
+      <!-- ===== 模块系统 ===== -->
+      <h2 id="modules">模块系统</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>module.agent</span></div>
+        <pre class="code-body"><span class="cm"># 导入标准库模块</span>
+<span class="kw">import</span> json
+<span class="kw">import</span> time
+
+<span class="cm"># 导入本地文件</span>
+<span class="kw">import</span> <span class="str">"./utils.afl"</span> <span class="kw">as</span> utils
+<span class="fn">print</span>(utils.<span class="fn">add</span>(<span class="num">3</span>, <span class="num">5</span>))
+
+<span class="cm"># 部分导入</span>
+<span class="kw">from</span> <span class="str">"./math.afl"</span> <span class="kw">import</span> add, sub
+<span class="fn">print</span>(<span class="fn">add</span>(<span class="num">3</span>, <span class="num">5</span>))
+
+<span class="cm"># 导出（utils.afl）</span>
+<span class="kw">function</span> <span class="fn">helper</span>() { <span class="kw">return</span> <span class="num">42</span> }
+<span class="kw">export</span> <span class="fn">helper</span></pre>
+      </div>
+
+      <!-- ===== 测试 ===== -->
+      <h2 id="testing">测试框架</h2>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span>test.agent</span></div>
+        <pre class="code-body"><span class="cm"># 单个测试</span>
+<span class="kw">test</span> <span class="str">"should add correctly"</span> {
+    assert <span class="fn">add</span>(<span class="num">2</span>, <span class="num">3</span>) == <span class="num">5</span>
+}
+
+<span class="cm"># 测试套件</span>
+<span class="kw">suite</span> <span class="str">"Calculator"</span> {
+    <span class="kw">test</span> <span class="str">"addition"</span> {
+        assert <span class="fn">add</span>(<span class="num">2</span>, <span class="num">3</span>) == <span class="num">5</span>
+    }
+    <span class="kw">test</span> <span class="str">"subtraction"</span> {
+        assert <span class="fn">sub</span>(<span class="num">5</span>, <span class="num">3</span>) == <span class="num">2</span>
+    }
+}
+
+<span class="cm"># 运行测试</span>
+<span class="fn">test.run</span>()           <span class="cm"># 运行所有</span>
+<span class="fn">test.run</span>(<span class="str">"Calculator"</span>)  <span class="cm"># 运行指定套件</span></pre>
+      </div>
+
+      <div class="note">
+        <strong>提示:</strong> 测试支持 <code>assert</code>、<code>assert_eq</code> 断言。
+        测试失败时会抛出 <code>AssertionError</code> 并显示详细信息。
+      </div>
+
+      <!-- ===== 内置函数大全 ===== -->
+      <h2 id="builtins">内置函数大全</h2>
+      <table>
+        <tr><th>函数</th><th>说明</th></tr>
+        <tr><td><code>print(...)</code></td><td>打印到标准输出</td></tr>
+        <tr><td><code>len(obj)</code></td><td>返回长度</td></tr>
+        <tr><td><code>type(obj)</code></td><td>返回类型名</td></tr>
+        <tr><td><code>int(s)</code>, <code>float(s)</code>, <code>str(v)</code>, <code>bool(v)</code></td><td>类型转换</td></tr>
+        <tr><td><code>abs(n)</code>, <code>round(n)</code>, <code>max(...)</code>, <code>min(...)</code></td><td>数学函数</td></tr>
+        <tr><td><code>json(obj)</code>, <code>json(s)</code></td><td>JSON 编码/解码</td></tr>
+        <tr><td><code>range(n)</code>, <code>range(s, e)</code></td><td>生成数值范围</td></tr>
+        <tr><td><code>append(lst, v)</code>, <code>pop(lst)</code></td><td>列表操作</td></tr>
+        <tr><td><code>sort(lst)</code></td><td>列表排序</td></tr>
+        <tr><td><code>regex(p, t)</code></td><td>正则匹配</td></tr>
+        <tr><td><code>env(k)</code></td><td>读取环境变量</td></tr>
+        <tr><td><code>path("join", ...)</code></td><td>路径拼接</td></tr>
+        <tr><td><code>path("dirname", p)</code>, <code>path("basename", p)</code></td><td>目录/文件名提取</td></tr>
+        <tr><td><code>uuid()</code></td><td>生成 UUID</td></tr>
+        <tr><td><code>base64("encode", d)</code>, <code>base64("decode", d)</code></td><td>Base64 编解码</td></tr>
+        <tr><td><code>hash("sha256", d)</code>, <code>hash("md5", d)</code></td><td>哈希计算</td></tr>
+        <tr><td><code>env(k)</code>, <code>env("set", k, v)</code></td><td>环境变量读取/设置</td></tr>
+        <tr><td><code>time()</code></td><td>当前时间戳</td></tr>
+        <tr><td><code>rand()</code>, <code>rand(n)</code></td><td>随机数</td></tr>
+        <tr><td><code>assert_eq(a, e)</code></td><td>值相等断言</td></tr>
+      </table>
+
+      <!-- ===== 保留字 ===== -->
+      <h2 id="keywords">保留字</h2>
+      <table>
+        <tr><th>类别</th><th>关键字</th></tr>
+        <tr><td>控制流</td><td><code>if</code> <code>else</code> <code>elseif</code> <code>for</code> <code>in</code> <code>while</code> <code>break</code> <code>continue</code></td></tr>
+        <tr><td>函数与模块</td><td><code>function</code> <code>return</code> <code>import</code> <code>from</code> <code>export</code> <code>test</code> <code>suite</code></td></tr>
+        <tr><td>错误处理</td><td><code>try</code> <code>catch</code> <code>finally</code> <code>throw</code></td></tr>
+        <tr><td>异步</td><td><code>async</code> <code>await</code> <code>parallel</code> <code>wait</code></td></tr>
+        <tr><td>逻辑</td><td><code>and</code> <code>or</code> <code>not</code></td></tr>
+        <tr><td>值</td><td><code>true</code> <code>false</code> <code>null</code></td></tr>
+        <tr><td>声明</td><td><code>let</code> <code>assert</code> <code>as</code> <code>then</code></td></tr>
+      </table>
+
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>AgentFlow Language (AFL) v1.6 &mdash; 专为 Agent 开发设计的领域特定语言</p>
+    <p style="margin-top:0.5rem">
+      <a href="index.html">Home</a> &middot;
+      <a href="docs.html">Docs</a> &middot;
+      <a href="playground.html">Playground</a>
+    </p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

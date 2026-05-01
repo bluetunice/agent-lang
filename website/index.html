@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentFlow Language (AFL) - 专为 Agent 设计的开发语言</title>
+  <meta name="description" content="AgentFlow Language (AFL) 是一门专为 Agent 开发设计的领域特定语言，支持 LLM 调用、知识库检索、MCP 协议、系统命令等。v1.6 已发布，425 项测试全面覆盖。">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='url(%23g)'/><defs><linearGradient id='g' x1='0' y1='0' x2='32' y2='32'><stop offset='0%25' stop-color='%233b82f6'/><stop offset='100%25' stop-color='%238b5cf6'/></linearGradient></defs><text x='16' y='23' text-anchor='middle' font-size='18' font-weight='bold' fill='white'>A</text></svg>">
+</head>
+<body>
+
+  <!-- ======== Navigation ======== -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">A</span>
+        AgentFlow
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="playground.html">Playground</a></li>
+        <li><span class="nav-version">v1.6</span></li>
+      </ul>
+      <button class="mobile-menu-btn">☰</button>
+    </div>
+  </nav>
+
+  <!-- ======== Hero ======== -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">🚀 v1.6 已发布 — 425 项测试覆盖</div>
+      <h1>为 Agent 而生<br>的开发语言</h1>
+      <p>AFL 是一门专为 LLM Agent 开发设计的领域特定语言。声明式 + 命令式混合，内置 LLM 调用、知识库检索、MCP 协议、异步并发，让 Agent 开发像写脚本一样简单。</p>
+      <div class="hero-buttons">
+        <a href="docs.html" class="btn btn-primary">📖 阅读文档</a>
+        <a href="playground.html" class="btn btn-secondary">▶️ 在线尝试</a>
+        <a href="#get-started" class="btn btn-secondary">⚡ 快速开始</a>
+      </div>
+
+      <div class="hero-demo fade-in">
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots">
+              <span class="dot-red"></span>
+              <span class="dot-yellow"></span>
+              <span class="dot-green"></span>
+            </div>
+            <span>hello.agent</span>
+            <button class="copy-btn" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:0.75rem">Copy</button>
+          </div>
+          <pre class="code-body"><span class="cm"># 一个简单的 QA Agent</span>
+<span class="kw">let</span> question = input.<span class="fn">args</span>()[<span class="num">0</span>] ?? input.<span class="fn">prompt</span>(<span class="str">"Ask me anything:"</span>)
+
+kb.<span class="fn">connect</span>(<span class="str">"local"</span>, { path: <span class="str">"./kb"</span> })
+<span class="kw">let</span> references = kb.<span class="fn">search</span>(question, top_k=<span class="num">3</span>)
+
+llm.<span class="fn">new</span>({ provider: <span class="str">"anthropic"</span>, model: <span class="str">"claude-3"</span> })
+<span class="kw">let</span> answer = llm.<span class="fn">prompt</span>(<span class="str">"Based on: {{refs}}\nQuestion: {{q}}"</span>, { refs: references, q: question })
+
+<span class="fn">print</span>(answer)
+output.<span class="fn">file</span>(<span class="str">"answer.txt"</span>, answer)
+
+<span class="cm"># 内置 skill 开箱即用</span>
+<span class="fn">print</span>(skill.math.<span class="fn">clamp</span>(<span class="num">150</span>, <span class="num">0</span>, <span class="num">100</span>))   <span class="cm"># 100</span>
+<span class="fn">print</span>(skill.text.<span class="fn">upper</span>(<span class="str">"hello"</span>))        <span class="cm"># HELLO</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== Features ======== -->
+  <section class="section" id="features">
+    <div class="section-header fade-in">
+      <h2>核心特性</h2>
+      <p>AFL 涵盖了 Agent 开发所需的全部核心能力</p>
+    </div>
+    <div class="features-grid">
+
+      <div class="feature-card fade-in">
+        <div class="feature-icon" style="background:rgba(59,130,246,0.15);color:#3b82f6">🧠</div>
+        <h3>LLM 原生集成</h3>
+        <p>内置 LLM 调用，支持多轮对话、提示模板、流式响应、结构化输出。兼容 OpenAI、Anthropic 等主流模型。</p>
+      </div>
+
+      <div class="feature-card fade-in">
+        <div class="feature-icon" style="background:rgba(16,185,129,0.15);color:#10b981">🔍</div>
+        <h3>知识库（RAG）</h3>
+        <p>原生向量数据库集成，支持文档添加、语义检索、结果直接注入 LLM 上下文，快速构建 RAG 应用。</p>
+      </div>
+
+      <div class="feature-card fade-in">
+        <div class="feature-icon" style="background:rgba(139,92,246,0.15);color:#8b5cf6">🔗</div>
+        <h3>MCP 协议</h3>
+        <p>支持 Model Context Protocol，标准化 Agent 工具调用。连接 MCP 服务器、调用工具、管理上下文。</p>
+      </div>
+
+      <div class="feature-card fade-in">
+        <div class="feature-icon" style="background:rgba(236,72,153,0.15);color:#ec4899">🧩</div>
+        <h3>Skill 技能系统</h3>
+        <p>内置 math、text、data 三大预设技能，支持 .agent/.afl 文件导入和动态调用。复用 Agent 能力单元，开箱即用。</p>
+      </div>
+
+      <div class="feature-card fade-in">
+        <div class="feature-icon" style="background:rgba(245,158,11,0.15);color:#f59e0b">⚙️</div>
+        <h3>系统命令</h3>
+        <p>安全的系统命令执行，支持超时控制、管道操作、平台信息查询、命令存在性检查。</p>
+      </div>
+
+      <div class="feature-card fade-in">
+        <div class="feature-icon" style="background:rgba(6,182,212,0.15);color:#06b6d4">⚡</div>
+        <h3>异步并发</h3>
+        <p>async/await 异步语法，parallel 并行执行块，wait all/any 同步原语，充分利用并发能力。</p>
+      </div>
+
+      <div class="feature-card fade-in">
+        <div class="feature-icon" style="background:rgba(236,72,153,0.15);color:#ec4899">📦</div>
+        <h3>模块系统</h3>
+        <p>支持代码导入导出，模块化组织。import/from/export 语法，条件导入，内置标准库。</p>
+      </div>
+
+      <div class="feature-card fade-in">
+        <div class="feature-icon" style="background:rgba(59,130,246,0.15);color:#3b82f6">🔄</div>
+        <h3>流程控制</h3>
+        <p>if/else if/else 条件分支，for/while 循环，break/continue，三元表达式，?? 空值合并。</p>
+      </div>
+
+      <div class="feature-card fade-in">
+        <div class="feature-icon" style="background:rgba(16,185,129,0.15);color:#10b981">🔧</div>
+        <h3>内置测试框架</h3>
+        <p>内置 test/suite 测试框架，assert 断言，assert_eq 值断言，test.run() 一键运行所有测试。</p>
+      </div>
+
+      <div class="feature-card fade-in">
+        <div class="feature-icon" style="background:rgba(139,92,246,0.15);color:#8b5cf6">🌐</div>
+        <h3>HTTP API</h3>
+        <p>内置 HTTP 客户端，支持 GET/POST/PUT/DELETE，JSON 自动编解码，请求/响应拦截。</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ======== Syntax Showcase ======== -->
+  <section class="syntax-showcase">
+    <div class="section">
+      <div class="section-header fade-in">
+        <h2>语法一览</h2>
+        <p>简洁直观的语法设计，上手即用</p>
+      </div>
+
+      <div class="syntax-tabs fade-in">
+        <button class="syntax-tab active" data-tab="variables">变量</button>
+        <button class="syntax-tab" data-tab="control">控制流</button>
+        <button class="syntax-tab" data-tab="functions">函数</button>
+        <button class="syntax-tab" data-tab="llm">LLM 调用</button>
+        <button class="syntax-tab" data-tab="api">API 请求</button>
+        <button class="syntax-tab" data-tab="async">异步并发</button>
+        <button class="syntax-tab" data-tab="skill">Skill</button>
+      </div>
+
+      <div class="syntax-panel active" id="panel-variables">
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+            <span>变量与类型</span>
+          </div>
+          <pre class="code-body"><span class="kw">let</span> name = <span class="str">"Alice"</span>               <span class="cm"># 字符串</span>
+<span class="kw">let</span> count = <span class="num">10</span>                   <span class="cm"># 整数</span>
+<span class="kw">let</span> rate = <span class="num">3.14</span>                  <span class="cm"># 浮点数</span>
+<span class="kw">let</span> active = <span class="kw">true</span>                <span class="cm"># 布尔值</span>
+<span class="kw">let</span> items = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]           <span class="cm"># 列表</span>
+<span class="kw">let</span> config = { timeout: <span class="num">30</span>, retry: <span class="kw">true</span> }  <span class="cm"># 字典</span>
+<span class="kw">let</span> empty = <span class="kw">null</span>                  <span class="cm"># 空值</span>
+
+<span class="cm"># 变量重新赋值</span>
+count = count + <span class="num">5</span>
+items[<span class="num">0</span>] = <span class="num">100</span>
+config[<span class="str">"retry"</span>] = <span class="kw">false</span></pre>
+        </div>
+      </div>
+
+      <div class="syntax-panel" id="panel-control">
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+            <span>控制流</span>
+          </div>
+          <pre class="code-body"><span class="kw">if</span> score >= <span class="num">90</span> {
+    <span class="fn">print</span>(<span class="str">"A"</span>)
+} <span class="kw">else</span> <span class="kw">if</span> score >= <span class="num">80</span> {
+    <span class="fn">print</span>(<span class="str">"B"</span>)
+} <span class="kw">else</span> {
+    <span class="fn">print</span>(<span class="str">"C"</span>)
+}
+
+<span class="cm"># 三元表达式</span>
+<span class="kw">let</span> level = <span class="kw">if</span> score >= <span class="num">60</span> <span class="kw">then</span> <span class="str">"pass"</span> <span class="kw">else</span> <span class="str">"fail"</span>
+
+<span class="cm"># for 循环</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>) { <span class="fn">print</span>(i) }
+
+<span class="cm"># while 循环</span>
+<span class="kw">while</span> x > <span class="num">0</span> { x = x - <span class="num">1</span> }
+
+<span class="cm"># ?? 空值合并</span>
+<span class="kw">let</span> display = name ?? <span class="str">"Guest"</span>
+
+<span class="cm"># in 成员检查</span>
+assert <span class="num">3</span> <span class="kw">in</span> [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]</pre>
+        </div>
+      </div>
+
+      <div class="syntax-panel" id="panel-functions">
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+            <span>函数</span>
+          </div>
+          <pre class="code-body"><span class="cm"># 基本函数</span>
+<span class="kw">function</span> <span class="fn">add</span>(a, b) {
+    <span class="kw">return</span> a + b
+}
+
+<span class="cm"># 带类型注解</span>
+<span class="kw">function</span> <span class="fn">greet</span>(name) -> <span class="tp">string</span> {
+    <span class="kw">return</span> <span class="str">"Hello, "</span> + name + <span class="str">"!"</span>
+}
+
+<span class="cm"># 默认参数</span>
+<span class="kw">function</span> <span class="fn">connect</span>(host, port=<span class="num">8080</span>, timeout=<span class="num">30</span>) {
+    <span class="cm"># ...</span>
+}
+
+<span class="cm"># 关键字参数调用</span>
+<span class="fn">connect</span>(<span class="str">"localhost"</span>, timeout=<span class="num">60</span>)
+
+<span class="cm"># 递归</span>
+<span class="kw">function</span> <span class="fn">factorial</span>(n) {
+    <span class="kw">if</span> n <= <span class="num">1</span> { <span class="kw">return</span> <span class="num">1</span> }
+    <span class="kw">return</span> n * <span class="fn">factorial</span>(n - <span class="num">1</span>)
+}</pre>
+        </div>
+      </div>
+
+      <div class="syntax-panel" id="panel-llm">
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+            <span>LLM 调用</span>
+          </div>
+          <pre class="code-body"><span class="cm"># 初始化 LLM</span>
+<span class="kw">let</span> llm = llm.<span class="fn">new</span>({
+    provider: <span class="str">"openai"</span>,
+    model: <span class="str">"gpt-4"</span>,
+    temperature: <span class="num">0.7</span>
+})
+
+<span class="cm"># 多轮对话</span>
+<span class="kw">let</span> response = llm.<span class="fn">chat</span>([
+    { role: <span class="str">"system"</span>, content: <span class="str">"You are a helpful assistant."</span> },
+    { role: <span class="str">"user"</span>, content: <span class="str">"What is the capital of France?"</span> }
+])
+<span class="fn">print</span>(response.content)
+
+<span class="cm"># 提示模板</span>
+<span class="kw">let</span> answer = llm.<span class="fn">prompt</span>(<span class="str">"Summarize: {{text}}"</span>, { text: long_text })
+
+<span class="cm"># 知识库增强</span>
+kb.<span class="fn">connect</span>(<span class="str">"chroma"</span>, { path: <span class="str">"./db"</span> })
+<span class="kw">let</span> context = kb.<span class="fn">search</span>(<span class="str">"How to reset password?"</span>)
+<span class="kw">let</span> answer = llm.<span class="fn">prompt</span>(<span class="str">"Context: {{ctx}}\nQuestion: {{q}}"</span>, { ctx: context, q: question })</pre>
+        </div>
+      </div>
+
+      <div class="syntax-panel" id="panel-api">
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+            <span>API 请求</span>
+          </div>
+          <pre class="code-body"><span class="cm"># GET 请求</span>
+<span class="kw">let</span> resp = api.<span class="fn">get</span>(<span class="str">"https://api.example.com/data"</span>)
+<span class="fn">print</span>(resp.status)
+<span class="fn">print</span>(resp.json())
+
+<span class="cm"># POST 请求</span>
+<span class="kw">let</span> result = api.<span class="fn">post</span>(<span class="str">"https://api.example.com/users"</span>, {
+    body: { name: <span class="str">"Alice"</span>, role: <span class="str">"admin"</span> },
+    headers: { Authorization: <span class="str">"Bearer "</span> + token },
+    timeout: <span class="num">30</span>
+})
+
+<span class="cm"># 通用调用</span>
+<span class="kw">let</span> resp = api.<span class="fn">call</span>(<span class="str">"GET"</span>, url, { params: { page: <span class="num">1</span> } })
+
+<span class="cm"># 错误处理</span>
+<span class="kw">if</span> resp.ok {
+    <span class="fn">print</span>(resp.body)
+} <span class="kw">else</span> {
+    log.<span class="fn">error</span>(<span class="str">"Request failed: "</span> + resp.status)
+}</pre>
+        </div>
+      </div>
+
+      <div class="syntax-panel" id="panel-async">
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+            <span>异步并发</span>
+          </div>
+          <pre class="code-body"><span class="cm"># 异步执行</span>
+<span class="kw">async</span> {
+    <span class="kw">let</span> result = <span class="kw">await</span> llm.<span class="fn">prompt</span>(<span class="str">"Hello"</span>)
+    <span class="fn">print</span>(result)
+}
+
+<span class="cm"># 并行执行</span>
+<span class="kw">parallel</span> {
+    <span class="kw">let</span> a = api.<span class="fn">call</span>(<span class="str">"GET"</span>, <span class="str">"https://api1.example.com"</span>)
+    <span class="kw">let</span> b = api.<span class="fn">call</span>(<span class="str">"GET"</span>, <span class="str">"https://api2.example.com"</span>)
+}
+<span class="kw">wait</span>(all)
+
+<span class="cm"># 异常处理</span>
+<span class="kw">try</span> {
+    <span class="kw">let</span> resp = api.<span class="fn">call</span>(<span class="str">"GET"</span>, <span class="str">"https://unreliable.com"</span>)
+} <span class="kw">catch</span> error {
+    log.<span class="fn">error</span>(<span class="str">"API failed: "</span> + error)
+} <span class="kw">finally</span> {
+    <span class="fn">print</span>(<span class="str">"cleanup"</span>)
+}</pre>
+        </div>
+      </div>
+
+      <div class="syntax-panel" id="panel-skill">
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+            <span>Skill 技能系统</span>
+          </div>
+          <pre class="code-body"><span class="cm"># math 预设 skill</span>
+<span class="fn">print</span>(skill.math.<span class="fn">add</span>(<span class="num">10</span>, <span class="num">20</span>))       <span class="cm"># 30</span>
+<span class="fn">print</span>(skill.math.<span class="fn">clamp</span>(<span class="num">150</span>, <span class="num">0</span>, <span class="num">100</span>))  <span class="cm"># 100</span>
+<span class="fn">print</span>(skill.math.<span class="fn">avg</span>(<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>))   <span class="cm"># 20.0</span>
+
+<span class="cm"># text 预设 skill</span>
+<span class="kw">let</span> upper = skill.text.<span class="fn">upper</span>(<span class="str">"hello"</span>)
+<span class="kw">let</span> parts = skill.text.<span class="fn">split</span>(<span class="str">"a,b,c"</span>, <span class="str">","</span>)
+<span class="kw">let</span> padded = skill.text.<span class="fn">pad_left</span>(<span class="str">"42"</span>, <span class="num">5</span>, <span class="str">"0"</span>)  <span class="cm"># "00042"</span>
+
+<span class="cm"># data 预设 skill</span>
+<span class="kw">let</span> keys = skill.data.<span class="fn">keys</span>({ name: <span class="str">"Alice"</span>, age: <span class="num">30</span> })
+<span class="kw">let</span> chunked = skill.data.<span class="fn">chunk</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>], <span class="num">2</span>)
+
+<span class="cm"># 管理 skill</span>
+skill.<span class="fn">list</span>()
+<span class="kw">let</span> result = skill.<span class="fn">run</span>(<span class="str">"math"</span>, { action: <span class="str">"add"</span>, a: <span class="num">100</span>, b: <span class="num">200</span> })</pre>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ======== Getting Started ======== -->
+  <section class="section" id="get-started">
+    <div class="section-header fade-in">
+      <h2>快速开始</h2>
+      <p>3 步上手 AFL</p>
+    </div>
+    <div class="steps">
+      <div class="step fade-in">
+        <div class="step-number">1</div>
+        <h3>克隆项目</h3>
+        <p>下载 AFL 解释器，纯 Python 实现，无第三方依赖。</p>
+        <div class="code-block" style="margin-top:0.75rem">
+          <pre class="code-body" style="font-size:0.8rem">git <span class="fn">clone</span>git@github.com:bluetunice/agent-lang.git
+<span class="builtin">cd</span> agent-lang</pre>
+        </div>
+      </div>
+      <div class="step fade-in">
+        <div class="step-number">2</div>
+        <h3>编写 Agent 脚本</h3>
+        <p>创建 <code>hello.agent</code> 文件：</p>
+        <div class="code-block" style="margin-top:0.75rem">
+          <pre class="code-body" style="font-size:0.8rem"><span class="kw">let</span> name = <span class="str">"World"</span>
+<span class="fn">print</span>(<span class="str">"Hello, "</span> + name + <span class="str">"!"</span>)</pre>
+        </div>
+      </div>
+      <div class="step fade-in">
+        <div class="step-number">3</div>
+        <h3>运行</h3>
+        <p>使用 AFL 解释器执行脚本：</p>
+        <div class="code-block" style="margin-top:0.75rem">
+          <pre class="code-body" style="font-size:0.8rem">python3 afl_lang/agent.<span class="fn">py</span> hello.agent
+<span class="cm"># 输出: Hello, World!</span>
+
+<span class="cm"># 或进入 REPL 交互模式</span>
+python3 afl_lang/agent.<span class="fn">py</span> repl</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== Why AFL ======== -->
+  <section class="section" style="border-top:1px solid var(--border-color)">
+    <div class="section-header fade-in">
+      <h2>为什么选择 AFL？</h2>
+    </div>
+    <div class="comparison-grid" style="margin-top:2rem">
+      <div class="fade-in">
+        <div class="compare-label">传统方式</div>
+        <div class="code-block">
+          <pre class="code-body" style="font-size:0.8rem;color:var(--text-muted)">
+<span class="cm"># Python + LangChain</span>
+<span class="kw">from</span> langchain.<span class="fn">llms</span> import OpenAI
+<span class="kw">from</span> langchain.<span class="fn">vectorstores</span> import Chroma
+
+llm = OpenAI(model=<span class="str">"gpt-4"</span>)
+db = Chroma(persist_directory=<span class="str">"./kb"</span>)
+docs = db.<span class="fn">similarity_search</span>(question)
+context = <span class="str">"\n"</span>.<span class="fn">join</span>([d.page_content <span class="kw">for</span> d <span class="kw">in</span> docs])
+prompt = <span class="str">f"Context: {context}\nQ: {question}"</span>
+answer = llm.<span class="fn">predict</span>(prompt)
+<span class="fn">print</span>(answer)</pre>
+        </div>
+      </div>
+      <div class="fade-in">
+        <div class="compare-label">AFL 方式</div>
+        <div class="code-block">
+          <pre class="code-body" style="font-size:0.8rem">
+kb.<span class="fn">connect</span>(<span class="str">"local"</span>, { path: <span class="str">"./kb"</span> })
+<span class="kw">let</span> docs = kb.<span class="fn">search</span>(question, top_k=<span class="num">3</span>)
+
+llm.<span class="fn">new</span>({ provider: <span class="str">"openai"</span>, model: <span class="str">"gpt-4"</span> })
+<span class="kw">let</span> answer = llm.<span class="fn">prompt</span>(<span class="str">"Context: {{ctx}}\nQ: {{q}}"</span>, { ctx: docs, q: question })
+<span class="fn">print</span>(answer)</pre>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:1.5rem;color:var(--text-secondary)" class="fade-in">
+      ✨ 代码量减少 <strong style="color:var(--accent-green)">60%</strong>，可读性大幅提升
+    </div>
+  </section>
+
+  <!-- ======== Footer ======== -->
+  <footer class="footer">
+    <p>AgentFlow Language (AFL) v1.6 &mdash; 专为 Agent 开发设计的领域特定语言</p>
+    <p style="margin-top:0.5rem">
+      <a href="docs.html">文档</a> &middot;
+      <a href="playground.html">Playground</a> &middot;
+      <a href="https://github.com/agent-flow/afl">GitHub</a>
+    </p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

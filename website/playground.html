@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playground - AgentFlow Language (AFL)</title>
+  <meta name="description" content="在线体验 AgentFlow Language (AFL)，编写和运行 Agent 脚本。">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='url(%23g)'/><defs><linearGradient id='g' x1='0' y1='0' x2='32' y2='32'><stop offset='0%25' stop-color='%233b82f6'/><stop offset='100%25' stop-color='%238b5cf6'/></linearGradient></defs><text x='16' y='23' text-anchor='middle' font-size='18' font-weight='bold' fill='white'>A</text></svg>">
+</head>
+<body>
+
+  <!-- ======== Navigation ======== -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">A</span>
+        AgentFlow
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="playground.html" class="active">Playground</a></li>
+        <li><span class="nav-version">v1.6</span></li>
+      </ul>
+      <button class="mobile-menu-btn">☰</button>
+    </div>
+  </nav>
+
+  <!-- ======== Playground ======== -->
+  <section class="section" style="padding-top:120px">
+    <div class="section-header fade-in">
+      <h2>在线 Playground</h2>
+      <p>在浏览器中编写和运行 AFL 脚本</p>
+    </div>
+
+    <div class="playground-toolbar fade-in">
+      <button class="btn btn-primary" id="run-btn">▶ 运行</button>
+      <button class="btn btn-secondary" id="clear-btn">清空</button>
+      <button class="btn btn-secondary" id="example-btn">加载示例</button>
+      <span class="playground-status" id="status">就绪</span>
+    </div>
+
+    <div class="playground-container fade-in">
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+          <span>main.agent</span>
+        </div>
+        <textarea class="code-body" id="play-input" spellcheck="false" placeholder="// Write AFL code here...">let name = "World"
+print("Hello, " + name + "!")
+
+# Try more AFL features:
+# let list = [1, 2, 3]
+# for i in list { print(i) }
+
+# function add(a, b) { return a + b }
+# print(add(3, 5))</textarea>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+          <span>Output</span>
+        </div>
+        <div class="output-body" id="play-output">// Click "Run" to execute the code</div>
+      </div>
+    </div>
+
+    <!-- Examples -->
+    <div class="playground-examples fade-in" style="margin-top:2rem">
+      <h3 style="margin-bottom:1rem;font-size:1rem;color:var(--text-secondary)">快速示例</h3>
+      <div class="example-chips">
+        <button class="example-chip" data-example="hello">Hello World</button>
+        <button class="example-chip" data-example="fizzbuzz">FizzBuzz</button>
+        <button class="example-chip" data-example="fibonacci">Fibonacci</button>
+        <button class="example-chip" data-example="api">API 调用</button>
+        <button class="example-chip" data-example="cmd">系统命令</button>
+        <button class="example-chip" data-example="sort">排序</button>
+        <button class="example-chip" data-example="skill">Skill 技能</button>
+      </div>
+    </div>
+
+    <!-- Syntax quick reference -->
+    <div class="playground-ref fade-in" style="margin-top:2.5rem">
+      <details>
+        <summary style="cursor:pointer;color:var(--accent-blue);font-size:0.9rem;font-weight:600">语法速查表</summary>
+        <div style="margin-top:1rem;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;font-size:0.85rem">
+          <div>
+            <div class="code-block">
+              <pre class="code-body" style="font-size:0.75rem">
+<span class="cm">// 变量</span>
+<span class="kw">let</span> x = <span class="num">42</span>
+<span class="kw">let</span> name = <span class="str">"AFL"</span>
+<span class="kw">let</span> items = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+<span class="kw">let</span> cfg = { key: <span class="str">"val"</span> }
+x = <span class="num">100</span>        <span class="cm"># 重新赋值</span>
+items[<span class="num">0</span>] = <span class="num">99</span>  <span class="cm"># 修改元素</span></pre>
+            </div>
+          </div>
+          <div>
+            <div class="code-block">
+              <pre class="code-body" style="font-size:0.75rem">
+<span class="cm">// 控制流</span>
+<span class="kw">if</span> x > <span class="num">10</span> {
+    <span class="fn">print</span>(<span class="str">"big"</span>)
+} <span class="kw">else</span> <span class="kw">if</span> x > <span class="num">5</span> {
+    <span class="fn">print</span>(<span class="str">"medium"</span>)
+} <span class="kw">else</span> {
+    <span class="fn">print</span>(<span class="str">"small"</span>)
+}
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>) { <span class="fn">print</span>(i) }</pre>
+            </div>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ======== Footer ======== -->
+  <footer class="footer">
+    <p>AgentFlow Language (AFL) v1.6 &mdash; 专为 Agent 开发设计的领域特定语言</p>
+    <p style="margin-top:0.5rem">
+      <a href="index.html">Home</a> &middot;
+      <a href="docs.html">文档</a> &middot;
+      <a href="https://github.com/agent-flow/afl">GitHub</a>
+    </p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

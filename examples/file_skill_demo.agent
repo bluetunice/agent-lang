@@ -1,0 +1,23 @@
+# ===========================================
+# File-based Skill Import Demo
+# ===========================================
+
+print("=== File Skill Import Demo ===\n")
+
+# 导入文件 skill
+skill.load("examples/string_utils.afl")
+print("imported: " + str(skill.list()))
+
+# 调用 skill 方法（支持 [] 和 . 两种方式）
+let titled = skill["examples/string_utils.afl"].title_case("hello world from afl")
+print("title_case: " + titled)
+
+let wc = skill["examples/string_utils.afl"].count_words("hello world")
+print("count_words: " + str(wc))
+assert wc == 2
+
+let ver = skill["examples/string_utils.afl"].VERSION
+print("VERSION: " + ver)
+assert ver == "1.0"
+
+print("\n=== File Skill Import 测试通过！===")

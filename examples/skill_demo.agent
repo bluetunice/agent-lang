@@ -1,0 +1,88 @@
+# ===========================================
+# AFL Skill Module Demo
+# ===========================================
+
+print("=== Skill Module Demo ===\n")
+
+# ── 1. 内置预设 skill: math ──
+print("--- 1. math skill ---")
+let result = skill.math.add(10, 20)
+assert result == 30
+print("math.add(10, 20) = " + str(result))
+
+let avg = skill.math.avg(10, 20, 30)
+assert avg == 20
+print("math.avg(10, 20, 30) = " + str(avg))
+
+let clamped = skill.math.clamp(150, 0, 100)
+assert clamped == 100
+print("math.clamp(150, 0, 100) = " + str(clamped))
+
+let sqrt_val = skill.math.sqrt(16)
+assert sqrt_val == 4
+print("math.sqrt(16) = " + str(sqrt_val))
+
+# ── 2. 内置预设 skill: text ──
+print("\n--- 2. text skill ---")
+let upper = skill.text.upper("hello")
+assert upper == "HELLO"
+print("text.upper('hello') = " + upper)
+
+let parts = skill.text.split("a,b,c", ",")
+assert len(parts) == 3
+print("text.split('a,b,c', ',') = " + str(parts))
+
+let joined = skill.text.join(["x", "y", "z"], "|")
+assert joined == "x|y|z"
+print("text.join(['x','y','z'], '|') = " + joined)
+
+let padded = skill.text.pad_left("42", 5, "0")
+assert padded == "00042"
+print("text.pad_left('42', 5, '0') = " + padded)
+
+let reversed = skill.text.reverse("abc")
+assert reversed == "cba"
+print("text.reverse('abc') = " + reversed)
+
+# ── 3. 内置预设 skill: data ──
+print("\n--- 3. data skill ---")
+let data = { "name": "Alice", "age": 30, "city": "Beijing" }
+let keys = skill.data.keys(data)
+print("data.keys: " + str(keys))
+
+let vals = skill.data.values(data)
+print("data.values: " + str(vals))
+
+let picked = skill.data.pick(data, "name", "age")
+print("data.pick(name, age): " + str(picked))
+
+let omitted = skill.data.omit(data, "age")
+print("data.omit(age): " + str(omitted))
+
+let nested = [[1, 2], [3, 4], [5, 6]]
+let flat = skill.data.flatten(nested)
+print("data.flatten(nested): " + str(flat))
+assert flat == [1, 2, 3, 4, 5, 6]
+
+let chunks = skill.data.chunk([1, 2, 3, 4, 5], 2)
+print("data.chunk([1,2,3,4,5], 2): " + str(chunks))
+
+# ── 4. skill.import() / skill.list() ──
+print("\n--- 4. skill management ---")
+let imported = skill.list()
+print("imported skills: " + str(imported))
+assert "math" in imported
+assert "text" in imported
+assert "data" in imported
+
+# ── 5. skill.run() ──
+print("\n--- 5. skill.run() ---")
+let result2 = skill.run("math", { action: "add", a: 100, b: 200 })
+assert result2 == 300
+print("skill.run('math', ...): " + str(result2))
+
+let result3 = skill.run("text", { action: "upper", s: "hello world" })
+assert result3 == "HELLO WORLD"
+print("skill.run('text', ...): " + result3)
+
+print("\n=== 所有 Skill 测试通过！===")

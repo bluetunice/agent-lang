@@ -1,0 +1,22 @@
+let name = "Alice"
+let count = 10
+
+print("Hello, " + name)
+print("Count: " + str(count))
+
+if count >= 10 {
+    print("Count >= 10")
+}
+
+let x = 10
+let y = 5
+print("10 + 5 = " + str(x + y))
+
+function add(a, b) {
+    return a + b
+}
+
+let result = add(3, 5)
+print("add(3, 5) = " + str(result))
+
+print("Done")

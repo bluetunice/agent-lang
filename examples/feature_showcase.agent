@@ -1,0 +1,723 @@
+# AFL 功能大全示例 - v1.6
+# 本示例覆盖 AFL 语言的所有核心功能，每节都可独立运行验证
+
+print("========================================")
+print("  AgentFlow Language (AFL) v1.6 功能大全")
+print("========================================")
+
+# ==========================================
+# 1. 变量与类型
+# ==========================================
+print("\n--- 1. 变量与类型 ---")
+
+let name: string = "Alice"
+let age: number = 30
+let height: number = 175.5
+let active: bool = true
+let scores: list = [95, 87, 92, 88]
+let info: dict = { "city": "Shanghai", "role": "developer" }
+let nothing: null = null
+
+print("name = " + name)
+print("age = " + str(age))
+print("height = " + str(height))
+print("active = " + str(active))
+print("scores = " + str(scores))
+print("info = " + str(info))
+print("nothing = " + str(nothing))
+
+# 类型检查
+assert type(name) == "str"
+assert type(age) == "int"
+assert type(height) == "float"
+assert type(active) == "bool"
+assert type(scores) == "list"
+assert type(info) == "dict"
+assert type(nothing) == "NoneType"
+print("类型检查通过")
+
+# ==========================================
+# 2. 运算符
+# ==========================================
+print("\n--- 2. 运算符 ---")
+
+# 算术
+assert 10 + 3 == 13
+assert 10 - 3 == 7
+assert 10 * 3 == 30
+assert 10 / 3 == 3.3333333333333335
+assert 10 % 3 == 1
+assert 2 ** 8 == 256
+
+# 比较
+assert 10 > 3
+assert 10 >= 10
+assert 3 < 10
+assert 3 <= 3
+assert 10 == 10
+assert 10 != 3
+
+# 逻辑
+assert true and true
+assert not (true and false)
+assert true or false
+assert not false
+
+# 空值合并 ??
+let val = null
+let fallback = val ?? "default"
+assert fallback == "default"
+let real = "hello"
+let use_real = real ?? "default"
+assert use_real == "hello"
+
+# 成员检查 in
+assert 3 in [1, 2, 3]
+assert "el" in "hello"
+
+# 字符串拼接
+assert "Hello " + "World" == "Hello World"
+# 字符串重复
+assert "ab" * 3 == "ababab"
+
+print("运算符测试通过")
+
+# ==========================================
+# 3. 条件分支
+# ==========================================
+print("\n--- 3. 条件分支 ---")
+
+let score = 85
+
+if score >= 90 {
+    print("优秀")
+} else if score >= 80 {
+    print("良好")
+} else if score >= 60 {
+    print("及格")
+} else {
+    print("不及格")
+}
+
+# 三元表达式
+let level = if score >= 60 then "pass" else "fail"
+assert level == "pass"
+
+let grade = if score >= 90 then "A" else if score >= 80 then "B" else "C"
+print("等级: " + grade)
+
+# ?? 三元
+let display = nothing ?? "Guest"
+assert display == "Guest"
+
+print("条件分支测试通过")
+
+# ==========================================
+# 4. 循环
+# ==========================================
+print("\n--- 4. 循环 ---")
+
+# for-range
+let sum = 0
+for i in range(5) {
+    sum = sum + i
+}
+assert sum == 10
+print("for-range sum = " + str(sum))
+
+# for-in list
+let total = 0
+for n in [10, 20, 30] {
+    total = total + n
+}
+assert total == 60
+print("for-in list total = " + str(total))
+
+# for-in string
+let chars = ""
+for c in "AB" {
+    chars = chars + c
+}
+assert chars == "AB"
+print("for-in string = " + chars)
+
+# while
+let counter = 0
+while counter < 3 {
+    counter = counter + 1
+}
+assert counter == 3
+print("while counter = " + str(counter))
+
+# break
+let break_sum = 0
+for i in range(10) {
+    if i >= 4 {
+        break
+    }
+    break_sum = break_sum + i
+}
+assert break_sum == 6
+print("break sum = " + str(break_sum))
+
+# continue
+let even_sum = 0
+for i in range(10) {
+    if i % 2 != 0 {
+        continue
+    }
+    even_sum = even_sum + i
+}
+assert even_sum == 20
+print("continue even_sum = " + str(even_sum))
+
+print("循环测试通过")
+
+# ==========================================
+# 5. 函数
+# ==========================================
+print("\n--- 5. 函数 ---")
+
+function add(a, b) {
+    return a + b
+}
+
+function greet(name) -> string {
+    return "Hello, " + name + "!"
+}
+
+function factorial(n) {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+function with_defaults(host, port=8080, timeout=30) {
+    return host + ":" + str(port) + " (timeout=" + str(timeout) + ")"
+}
+
+assert add(3, 5) == 8
+assert greet("World") == "Hello, World!"
+assert factorial(6) == 720
+assert with_defaults("localhost") == "localhost:8080 (timeout=30)"
+assert with_defaults("localhost", port=3000) == "localhost:3000 (timeout=30)"
+
+print("add(3, 5) = " + str(add(3, 5)))
+print("factorial(6) = " + str(factorial(6)))
+print("函数测试通过")
+
+# ==========================================
+# 6. 列表与字典
+# ==========================================
+print("\n--- 6. 列表与字典 ---")
+
+# 列表
+let lst = [1, 2, 3]
+assert lst[0] == 1
+assert lst[-1] == 3
+
+append(lst, 4)
+assert len(lst) == 4
+assert lst[3] == 4
+
+let popped = pop(lst)
+assert popped == 4
+assert len(lst) == 3
+
+let sorted_lst = sort([5, 3, 1, 4, 2])
+print("sorted: " + str(sorted_lst))
+
+# 列表重新赋值
+lst[0] = 100
+assert lst[0] == 100
+
+# 字典
+let user = { "name": "Alice", "age": 30 }
+assert user["name"] == "Alice"
+assert user["age"] == 30
+user["city"] = "Shanghai"
+assert user["city"] == "Shanghai"
+assert len(user) == 3
+
+print("列表与字典测试通过")
+
+# ==========================================
+# 7. 错误处理
+# ==========================================
+print("\n--- 7. 错误处理 ---")
+
+let caught = false
+let cleaned = false
+
+try {
+    throw "something went wrong"
+} catch err {
+    caught = true
+    assert err == "something went wrong"
+    print("捕获错误: " + err)
+} finally {
+    cleaned = true
+    print("finally 块执行")
+}
+
+assert caught == true
+assert cleaned == true
+
+# assert / assert_eq
+assert 1 + 1 == 2
+assert_eq(len([1, 2, 3]), 3)
+
+print("错误处理测试通过")
+
+# ==========================================
+# 8. 内置函数 - 类型转换
+# ==========================================
+print("\n--- 8. 内置函数 - 类型转换 ---")
+
+assert int("42") == 42
+assert float("3.14") == 3.14
+assert str(123) == "123"
+assert bool(1) == true
+assert bool(0) == false
+assert int(null) == 0
+assert float(null) == 0.0
+assert str(null) == ""
+assert bool(null) == false
+
+print("类型转换测试通过")
+
+# ==========================================
+# 9. 内置函数 - 数学
+# ==========================================
+print("\n--- 9. 内置函数 - 数学 ---")
+
+assert abs(-42) == 42
+assert round(3.7) == 4
+assert max(1, 5, 3) == 5
+assert min(1, 5, 3) == 1
+
+print("数学函数测试通过")
+
+# ==========================================
+# 10. 内置函数 - 数据工具
+# ==========================================
+print("\n--- 10. 内置函数 - 数据工具 ---")
+
+# range
+assert len(range(5)) == 5
+assert range(2, 5) == [2, 3, 4]
+assert range(0, 6, 2) == [0, 2, 4]
+
+# len / type
+assert len("hello") == 5
+assert type([]) == "list"
+assert type({}) == "dict"
+
+# rand
+let r = rand(100)
+assert r >= 0 and r < 100
+print("rand(100) = " + str(r))
+
+print("数据工具测试通过")
+
+# ==========================================
+# 11. 内置函数 - JSON
+# ==========================================
+print("\n--- 11. JSON ---")
+
+let obj = { "name": "AFL", "version": "1.6" }
+let json_str = json(obj)
+assert type(json_str) == "str"
+print("json encode: " + json_str)
+
+let parsed = json(json_str)
+assert parsed["name"] == "AFL"
+assert parsed["version"] == "1.6"
+print("json decode: " + str(parsed))
+
+# json 模块形式
+let j = json()
+let parsed2 = j.parse('{"x": 100}')
+assert parsed2["x"] == 100
+print("json module parse: " + str(parsed2))
+
+print("JSON 测试通过")
+
+# ==========================================
+# 12. 内置函数 - 工具函数
+# ==========================================
+print("\n--- 12. 工具函数 ---")
+
+# uuid
+let uid = uuid()
+assert type(uid) == "str"
+assert len(uid) > 0
+print("uuid: " + uid)
+
+# time
+let t = time()
+assert type(t) == "float"
+print("time: " + str(t))
+
+# base64
+let b64enc = base64("encode", "Hello AFL")
+print("base64 encode: " + b64enc)
+let b64dec = base64("decode", b64enc)
+assert b64dec == "Hello AFL"
+print("base64 decode: " + b64dec)
+
+# base64 模块形式
+let b = base64()
+assert b.encode("test") == base64("encode", "test")
+print("base64 module OK")
+
+# hash
+let sha = hash("sha256", "hello")
+assert len(sha) == 64
+print("sha256: " + sha)
+
+let md5 = hash("md5", "hello")
+assert len(md5) == 32
+print("md5: " + md5)
+
+print("工具函数测试通过")
+
+# ==========================================
+# 13. 内置函数 - 正则表达式
+# ==========================================
+print("\n--- 13. 正则表达式 ---")
+
+# 模块形式
+let re = regex()
+let m = re.match(r"\d+", "abc123def")
+assert m != null
+print("regex match: " + str(m))
+
+let replaced = re.replace(r"\d", "X", "a1b2c3")
+assert replaced == "aXbXcX"
+print("regex replace: " + replaced)
+
+print("正则表达式测试通过")
+
+# ==========================================
+# 14. 内置函数 - 环境变量与路径
+# ==========================================
+print("\n--- 14. 环境变量与路径 ---")
+
+# env
+let home = env("HOME")
+assert home != null
+print("HOME: " + home)
+
+# env 模块形式
+let e = env()
+let path_val = e.get("PATH")
+assert path_val != null
+
+# path
+let p = path()
+let joined = p.join("/tmp", "file.txt")
+assert joined == "/tmp/file.txt"
+print("path join: " + joined)
+
+let dir = p.dirname("/tmp/file.txt")
+assert dir == "/tmp"
+print("path dirname: " + dir)
+
+let base = p.basename("/tmp/file.txt")
+assert base == "file.txt"
+print("path basename: " + base)
+
+print("环境变量与路径测试通过")
+
+# ==========================================
+# 15. 系统命令 (cmd)
+# ==========================================
+print("\n--- 15. 系统命令 ---")
+
+# 平台信息
+print("Platform: " + cmd.platform.system + " " + cmd.platform.release)
+print("Python: " + cmd.platform.python)
+print("User: " + cmd.shell.user)
+print("CWD: " + cmd.cwd)
+print("Home: " + cmd.home)
+
+# 命令检查
+if cmd.exists("python3") {
+    print("Python3 version: " + cmd.version("python3"))
+}
+
+# 执行命令
+let result = cmd.run("echo Hello AFL")
+assert result.success == true
+assert "Hello AFL" in result.stdout
+print("cmd.run stdout: " + result.stdout.strip())
+print("cmd.run exit_code: " + str(result.exit_code))
+
+# which
+let py_path = cmd.which("python3")
+assert py_path.found == true
+print("python3 path: " + str(py_path.path))
+
+print("系统命令测试通过")
+
+# ==========================================
+# 16. 日志 (log)
+# ==========================================
+print("\n--- 16. 日志 ---")
+
+log.info("This is an info message")
+log.debug("This is a debug message")
+log.warn("This is a warning")
+log.error("This is an error")
+
+print("日志测试通过")
+
+# ==========================================
+# 17. 输入输出 (input/output)
+# ==========================================
+print("\n--- 17. 输入输出 ---")
+
+let args = input.args()
+assert type(args) == "list"
+print("Command args: " + str(args))
+
+# output.file
+output.file("/tmp/afl_test_output.txt", "Hello from AFL v1.6")
+print("File written to /tmp/afl_test_output.txt")
+
+print("输入输出测试通过")
+
+# ==========================================
+# 18. HTTP API (api)
+# ==========================================
+print("\n--- 18. HTTP API ---")
+
+# api 模块创建
+let api_mod = api
+assert hasattr(api_mod, "get") or api_mod.get != null
+print("api module available: get, post, put, delete, call")
+
+print("HTTP API 测试通过")
+
+# ==========================================
+# 19. LLM 调用 (llm)
+# ==========================================
+print("\n--- 19. LLM ---")
+
+llm.new({ provider: "openai", model: "gpt-4" })
+let llm_response = llm.prompt("Tell me about AFL")
+assert llm_response == "LLM response"
+print("llm.prompt: " + llm_response)
+
+let chat_resp = llm.chat([
+    { role: "system", content: "You are helpful." },
+    { role: "user", content: "Hi" }
+])
+print("llm.chat content: " + chat_resp.content)
+
+print("LLM 测试通过")
+
+# ==========================================
+# 20. 知识库 (kb)
+# ==========================================
+print("\n--- 20. 知识库 ---")
+
+kb.connect("local", { path: "./kb" })
+let kb_results = kb.search("How to use AFL?", top_k=3)
+assert type(kb_results) == "list"
+print("kb.search results: " + str(kb_results))
+
+print("知识库测试通过")
+
+# ==========================================
+# 21. MCP 协议 (mcp)
+# ==========================================
+print("\n--- 21. MCP 协议 ---")
+
+mcp.connect("http://localhost:8080")
+let tools = mcp.list_tools()
+assert type(tools) == "list"
+print("mcp.list_tools: " + str(tools))
+
+let tool_result = mcp.call_tool("weather", { city: "Beijing" })
+assert type(tool_result) == "dict"
+print("mcp.call_tool: " + str(tool_result))
+
+print("MCP 测试通过")
+
+# ==========================================
+# 22. Skill 技能系统
+# ==========================================
+print("\n--- 22. Skill 技能系统 ---")
+
+# math
+skill.load("math")
+assert skill.math.add(10, 20) == 30
+assert skill.math.subtract(10, 3) == 7
+assert skill.math.multiply(4, 5) == 20
+assert skill.math.divide(10, 2) == 5.0
+assert skill.math.abs(-42) == 42
+assert skill.math.floor(3.7) == 3
+assert skill.math.ceil(3.2) == 4
+assert skill.math.round(3.7) == 4
+assert skill.math.sum(1, 2, 3, 4, 5) == 15
+assert skill.math.avg(10, 20, 30) == 20.0
+assert skill.math.sqrt(16) == 4.0
+assert skill.math.pow(2, 10) == 1024
+assert skill.math.min(5, 1, 3) == 1
+assert skill.math.max(5, 1, 3) == 5
+assert skill.math.clamp(150, 0, 100) == 100
+print("math skill: 15/15 methods OK")
+
+# text
+skill.load("text")
+assert skill.text.upper("hello") == "HELLO"
+assert skill.text.lower("HELLO") == "hello"
+assert skill.text.trim("  hi  ") == "hi"
+assert skill.text.replace("hello", "l", "L") == "heLLo"
+assert skill.text.split("a,b,c", ",") == ["a", "b", "c"]
+assert skill.text.join(["a", "b"], "-") == "a-b"
+assert skill.text.contains("hello", "ell") == true
+assert skill.text.starts_with("hello", "hel") == true
+assert skill.text.ends_with("hello", "llo") == true
+assert skill.text.length("hello") == 5
+assert skill.text.substring("hello", 1, 4) == "ell"
+assert skill.text.reverse("abc") == "cba"
+assert skill.text.pad_left("42", 5, "0") == "00042"
+assert skill.text.pad_right("42", 5, "0") == "42000"
+assert skill.text.count("hello", "l") == 2
+assert skill.text.find("hello", "e") == 1
+assert skill.text.capitalize("hello") == "Hello"
+print("text skill: 17/17 methods OK")
+
+# data
+skill.load("data")
+assert skill.data.get({"a": 1}, "a", 0) == 1
+assert skill.data.get({"a": 1}, "b", 0) == 0
+assert skill.data.keys({"a": 1, "b": 2}) == ["a", "b"] or skill.data.keys({"a": 1, "b": 2}) == ["b", "a"]
+assert skill.data.values({"a": 1, "b": 2}) == [1, 2] or skill.data.values({"a": 1, "b": 2}) == [2, 1]
+assert skill.data.first([1, 2, 3]) == 1
+assert skill.data.last([1, 2, 3]) == 3
+assert skill.data.take([1, 2, 3, 4], 2) == [1, 2]
+assert skill.data.drop([1, 2, 3, 4], 2) == [3, 4]
+assert skill.data.slice([1, 2, 3, 4], 1, 3) == [2, 3]
+assert skill.data.chunk([1, 2, 3, 4, 5], 2) == [[1, 2], [3, 4], [5]]
+assert skill.data.flatten([[1, 2], [3, 4]]) == [1, 2, 3, 4]
+assert skill.data.unique([1, 2, 2, 3]) == [1, 2, 3]
+assert skill.data.sort([3, 1, 2]) == [1, 2, 3]
+assert skill.data.reverse([1, 2, 3]) == [3, 2, 1]
+assert skill.data.merge({"a": 1}, {"b": 2}) == {"a": 1, "b": 2}
+assert skill.data.pick({"a": 1, "b": 2}, "a") == {"a": 1}
+assert skill.data.omit({"a": 1, "b": 2}, "a") == {"b": 2}
+print("data skill: 18/18 methods OK")
+
+# skill 管理
+let skills = skill.list()
+assert "math" in skills
+assert "text" in skills
+assert "data" in skills
+print("skill.list(): " + str(skills))
+
+# skill.run
+let run_result = skill.run("math", { action: "add", a: 100, b: 200 })
+assert run_result == 300
+print("skill.run: " + str(run_result))
+
+print("Skill 技能系统测试通过")
+
+# ==========================================
+# 23. 异步与并发
+# ==========================================
+print("\n--- 23. 异步与并发 ---")
+
+# async block
+let async_result = async {
+    let x = 10
+    let y = 20
+    x + y
+}
+assert async_result == 30
+print("async result: " + str(async_result))
+
+# parallel block
+let parallel_result = parallel {
+    let a = 1 + 2
+    let b = 3 + 4
+}
+print("parallel result: " + str(parallel_result))
+
+# wait
+let v1 = 100
+let v2 = 200
+let wait_all = wait(all) [v1, v2]
+assert wait_all == [100, 200]
+print("wait(all): " + str(wait_all))
+
+let wait_any = wait(any) [v1, v2]
+assert wait_any == 100
+print("wait(any): " + str(wait_any))
+
+print("异步与并发测试通过")
+
+# ==========================================
+# 24. 模块系统
+# ==========================================
+print("\n--- 24. 模块系统 ---")
+
+# import
+import "examples/util.afl"
+let util_result = double(5)
+assert util_result == 10
+print("import util.afl: double(5) = " + str(util_result))
+
+# import as
+import "examples/util.afl" as util2
+assert util2.triple(3) == 9
+print("import as util2: triple(3) = " + str(util2.triple(3)))
+
+# from import
+from "examples/string_utils.afl" import title_case
+assert title_case("hello world") == "Hello World"
+print("from import: title_case = " + title_case("hello world"))
+
+print("模块系统测试通过")
+
+# ==========================================
+# 25. 测试框架
+# ==========================================
+print("\n--- 25. 测试框架 ---")
+
+test "arithmetic" {
+    assert 1 + 1 == 2
+    assert 2 * 3 == 6
+}
+
+test "string concat" {
+    assert "hello" + " " + "world" == "hello world"
+}
+
+test "list length" {
+    assert len([1, 2, 3]) == 3
+}
+
+suite "Math Tests" {
+    test "addition" {
+        assert add(2, 3) == 5
+    }
+    test "factorial" {
+        assert factorial(5) == 120
+    }
+}
+
+test.run()
+print("测试框架测试通过")
+
+# ==========================================
+# 总结
+# ==========================================
+print("\n========================================")
+print("  所有 25 个功能模块测试通过！")
+print("  AFL v1.6 功能大全示例运行完成")
+print("========================================")

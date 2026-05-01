@@ -1,0 +1,9 @@
+# AgentFlow Language (AFL) 运行时依赖
+# 核心解释器无第三方依赖，以下功能为可选：
+#
+# LLM 支持: openai>=1.0.0
+# MCP 支持: requests>=2.31.0
+# 知识库: chromadb>=0.4.0  (可选)
+
+# 测试
+pytest>=7.0.0

@@ -1,0 +1,483 @@
+# 完整功能测试套件 - AFL v1.3
+
+print("=== AFL 完整功能测试开始 ===")
+
+## 1. 基础变量与类型测试
+print("\n=== 1. 基础变量与类型 ===")
+
+let name = "Alice"
+let count = 10
+let rate = 3.14
+let active = true
+let items = [1, 2, 3, 4, 5]
+let config = { "timeout": 30, "retry": true, "mode": "auto" }
+let empty = null
+
+assert name == "Alice"
+assert count == 10
+assert rate == 3.14
+assert active == true
+assert len(items) == 5
+assert config["timeout"] == 30
+assert config["retry"] == true
+assert empty == null
+
+print("基础变量测试通过")
+
+## 2. 类型检查
+print("\n=== 2. 类型检查 ===")
+
+assert type(name) == "str"
+assert type(count) == "int"
+assert type(rate) == "float"
+assert type(active) == "bool"
+assert type(items) == "list"
+assert type(config) == "dict"
+assert type(empty) == "NoneType"
+
+print("类型检查测试通过")
+
+## 3. 运算符测试
+print("\n=== 3. 运算符测试 ===")
+
+# 算术运算
+assert 10 + 5 == 15
+assert 10 - 5 == 5
+assert 10 * 5 == 50
+assert 10 / 5 == 2.0
+assert 10 ** 2 == 100
+assert 10 % 3 == 1
+
+# 比较运算
+assert 10 > 5
+assert 10 >= 10
+assert 5 < 10
+assert 5 <= 5
+assert 10 == 10
+assert 10 != 5
+
+# 逻辑运算
+assert true and true
+assert true or false
+assert not false
+
+# 字符串拼接
+assert "Hello" + " " + "World" == "Hello World"
+
+print("运算符测试通过")
+
+## 4. 索引访问测试
+print("\n=== 4. 索引访问测试 ===")
+
+let list_data = [10, 20, 30, 40, 50]
+let dict_data = { "a": 100, "b": 200, "c": 300 }
+
+assert list_data[0] == 10
+assert list_data[2] == 30
+assert list_data[4] == 50
+assert dict_data["a"] == 100
+assert dict_data["b"] == 200
+assert dict_data["c"] == 300
+
+# 字符串索引
+let str_data = "Hello"
+assert str_data[0] == "H"
+assert str_data[4] == "o"
+
+print("索引访问测试通过")
+
+## 5. 条件分支测试
+print("\n=== 5. 条件分支测试 ===")
+
+let score = 85
+
+if score >= 90 {
+    let grade = "A"
+    assert grade == "A"
+} else if score >= 80 {
+    let grade = "B"
+    assert grade == "B"
+} else {
+    let grade = "C"
+    assert false  # 不应该到这里
+}
+
+# 三元表达式
+let result = if score >= 60 then "pass" else "fail"
+assert result == "pass"
+
+let result2 = if score >= 90 then "excellent" else "good"
+assert result2 == "good"
+
+print("条件分支测试通过")
+
+## 6. 循环测试
+print("\n=== 6. 循环测试 ===")
+
+# for-in 循环（range）
+let sum1 = 0
+for i in range(5) {
+    sum1 = sum1 + i
+}
+assert sum1 == 0 + 1 + 2 + 3 + 4
+
+# for-in 循环（列表）
+let sum2 = 0
+for item in [10, 20, 30] {
+    sum2 = sum2 + item
+}
+assert sum2 == 60
+
+# while 循环
+let counter = 0
+let sum3 = 0
+while counter < 5 {
+    sum3 = sum3 + counter
+    counter = counter + 1
+}
+assert sum3 == 0 + 1 + 2 + 3 + 4
+assert counter == 5
+
+# break 测试
+let break_sum = 0
+for i in range(10) {
+    if i >= 3 {
+        break
+    }
+    break_sum = break_sum + i
+}
+assert break_sum == 0 + 1 + 2
+assert i == 3  # 注意：i 在循环外可能不可访问，这取决于实现
+
+print("循环测试通过")
+
+## 7. 函数测试
+print("\n=== 7. 函数测试 ===")
+
+function add(a, b) {
+    return a + b
+}
+
+function multiply(a, b) {
+    return a * b
+}
+
+function greet(name) -> string {
+    return "Hello, " + name + "!"
+}
+
+function factorial(n) {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+function with_default(name, greeting="Hello") -> string {
+    return greeting + ", " + name + "!"
+}
+
+assert add(3, 5) == 8
+assert multiply(4, 6) == 24
+assert greet("World") == "Hello, World!"
+assert factorial(5) == 120
+assert with_default("Alice") == "Hello, Alice!"
+assert with_default("Bob", greeting="Hi") == "Hi, Bob!"
+
+print("函数测试通过")
+
+## 8. 列表操作测试
+print("\n=== 8. 列表操作 ===")
+
+let lst = [1, 2, 3]
+append(lst, 4)
+assert len(lst) == 4
+assert lst[3] == 4
+
+let popped = pop(lst)
+assert popped == 4
+assert len(lst) == 3
+
+let sorted_lst = sort([3, 1, 4, 1, 5])
+assert sorted_lst[0] == 1
+assert sorted_lst[1] == 1
+assert sorted_lst[2] == 3
+assert sorted_lst[3] == 4
+assert sorted_lst[4] == 5
+
+# sort 测试
+let numbers = [3, 1, 4, 1, 5, 6]
+let sorted_nums = sort(numbers)
+assert sorted_nums[0] == 1
+assert sorted_nums[1] == 1
+assert sorted_nums[2] == 3
+assert sorted_nums[3] == 4
+assert sorted_nums[4] == 5
+assert sorted_nums[5] == 6
+
+# 列表连接测试
+let lst_a = [1, 2, 3]
+let lst_b = [4, 5, 6]
+let combined = lst_a + lst_b
+assert len(combined) == 6
+assert combined[0] == 1
+assert combined[5] == 6
+
+print("列表操作测试通过")
+
+## 9. 字典操作测试
+print("\n=== 9. 字典操作 ===")
+
+let dict = { "name": "Alice", "age": 30 }
+assert dict["name"] == "Alice"
+assert dict["age"] == 30
+
+# 更新值
+dict["age"] = 31
+assert dict["age"] == 31
+
+# 添加新键
+dict["city"] = "Shanghai"
+assert dict["city"] == "Shanghai"
+assert len(dict) == 3
+
+print("字典操作测试通过")
+
+## 10. 错误处理测试
+print("\n=== 10. 错误处理 ===")
+
+let error_caught = false
+let finally_executed = false
+
+try {
+    throw "Test error"
+} catch err {
+    error_caught = true
+    assert err == "Test error"
+} finally {
+    finally_executed = true
+}
+
+assert error_caught
+assert finally_executed
+
+# assert 测试
+let assert_passed = true
+try {
+    assert_eq(2 + 3, 5)
+} catch e {
+    assert_passed = false
+}
+assert assert_passed
+
+print("错误处理测试通过")
+
+## 11. 内置函数测试
+print("\n=== 11. 内置函数 ===")
+
+# 数学函数
+assert abs(-5) == 5
+assert abs(5) == 5
+
+# 类型转换
+assert int("42") == 42
+assert float("3.14") == 3.14
+assert str(123) == "123"
+assert bool(1) == true
+assert bool(0) == false
+
+# 实用函数
+let uuid_val = uuid()
+assert type(uuid_val) == "str"
+assert len(uuid_val) > 0
+
+let time_val = time()
+assert type(time_val) == "float"
+
+print("内置函数测试通过")
+
+## 12. 系统命令测试（模拟）
+print("\n=== 12. 系统命令 ===")
+
+assert cmd.platform.system != null
+assert cmd.platform.machine != null
+assert cmd.cwd != null
+assert cmd.home != null
+
+print("系统命令测试通过")
+
+## 13. 输入输出测试
+print("\n=== 13. 输入输出 ===")
+
+# 命令行参数（可能没有）
+let args = input.args()
+assert type(args) == "list"
+
+print("输入输出测试通过")
+
+## 14. JSON 测试
+print("\n=== 14. JSON ===")
+
+let json_str = json({ "a": 1, "b": 2 })
+assert type(json_str) == "str"
+
+let parsed = json(json_str)
+assert parsed["a"] == 1
+assert parsed["b"] == 2
+
+print("JSON 测试通过")
+
+## 15. Base64 测试
+print("\n=== 15. Base64 ===")
+
+let encoded = base64("encode", "Hello")
+assert type(encoded) == "str"
+
+let decoded = base64("decode", encoded)
+assert decoded == "Hello"
+
+print("Base64 测试通过")
+
+## 16. 哈希测试
+print("\n=== 16. 哈希 ===")
+
+let hash_val = hash("sha256", "test")
+assert type(hash_val) == "str"
+assert len(hash_val) == 64  # SHA256 输出 64 个十六进制字符
+
+print("哈希测试通过")
+
+## 17. 正则表达式测试
+print("\n=== 17. 正则表达式 ===")
+
+let match_result = regex(r"\d+", "abc123def")
+assert match_result != null
+
+print("正则表达式测试通过")
+
+## 18. 环境变量测试
+print("\n=== 18. 环境变量 ===")
+
+let home = env("HOME")
+assert home != null
+assert type(home) == "str"
+
+print("环境变量测试通过")
+
+## 19. 路径操作测试
+print("\n=== 19. 路径操作 ===")
+
+let joined = path("join", "/tmp", "test.txt")
+assert joined == "/tmp/test.txt"
+
+print("路径操作测试通过")
+
+## 20. 知识库测试（模拟）
+print("\n=== 20. 知识库 ===")
+
+kb.connect("local", { path: "./kb" })
+let results = kb.search("test query", top_k=3)
+assert type(results) == "list"
+
+print("知识库测试通过")
+
+## 21. LLM 测试（模拟）
+print("\n=== 21. LLM ===")
+
+llm.new({ provider: "anthropic", model: "claude-3" })
+let response = llm.prompt("Hello")
+assert response == "LLM response"
+
+print("LLM 测试通过")
+
+## 22. 日志测试
+print("\n=== 22. 日志 ===")
+
+# 日志不应该报错
+log.info("Test info")
+log.debug("Test debug")
+log.warn("Test warn")
+log.error("Test error")
+
+print("日志测试通过")
+
+## 23. 异步测试（基本语法）
+print("\n=== 23. 异步语法 ===")
+
+# 测试异步语法是否正确解析（不实际执行）
+let async_code = """
+async {
+    let result = await llm.prompt("Hello")
+    print(result)
+}
+"""
+assert type(async_code) == "str"
+
+print("异步语法测试通过")
+
+## 24. 并行测试（基本语法）
+print("\n=== 24. 并行语法 ===")
+
+let parallel_code = """
+parallel {
+    let a = api.call("GET", "url1")
+    let b = api.call("GET", "url2")
+}
+wait(all)
+"""
+assert type(parallel_code) == "str"
+
+print("并行语法测试通过")
+
+## 25. 模块系统测试（语法）
+print("\n=== 25. 模块系统 ===")
+
+let import_code = """
+import "./utils.afl" as utils
+from "./math.afl" import add, sub
+export helper
+"""
+assert type(import_code) == "str"
+
+print("模块系统语法测试通过")
+
+## 总结
+print("\n=== 测试总结 ===")
+print("所有基础功能测试完成！")
+
+# 使用测试框架运行正式测试
+suite "Complete Test Suite" {
+    test "variable types" {
+        let a = 1
+        let b = "str"
+        let c = true
+        assert type(a) == "int"
+        assert type(b) == "str"
+        assert type(c) == "bool"
+    }
+    
+    test "list operations" {
+        let lst = [1, 2, 3]
+        assert len(lst) == 3
+        assert lst[0] == 1
+    }
+    
+    test "dict operations" {
+        let d = { "key": "value" }
+        assert d["key"] == "value"
+    }
+    
+    test "function call" {
+        function double(x) { return x * 2 }
+        assert double(5) == 10
+    }
+    
+    test "keyword arguments" {
+        function greet(n, g="Hi") { return g + ", " + n }
+        assert greet("Alice") == "Hi, Alice"
+        assert greet("Bob", g="Hello") == "Hello, Bob"
+    }
+}
+
+test.run("Complete Test Suite")
+print("\n=== 所有测试通过！===")

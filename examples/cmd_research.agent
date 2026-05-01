@@ -1,0 +1,114 @@
+# ===========================================
+# AFL System Research - Real-World Example
+# Investigate the current system environment
+# ===========================================
+
+function divider(title) {
+    print("\n" + "=" * 50)
+    print("  " + title)
+    print("=" * 50)
+}
+
+function check_cmd(name) {
+    if cmd.exists(name) {
+        let loc = cmd.which(name)
+        let ver = cmd.version(name)
+        print("[OK] " + name + " installed at " + loc.path)
+        if ver != "" {
+            print("     version: " + ver)
+        }
+        return true
+    } else {
+        print("[--] " + name + " not found")
+        return false
+    }
+}
+
+# --- System Overview ---
+divider("System Overview")
+print("OS:      " + cmd.platform.system + " " + cmd.platform.release)
+print("Arch:    " + cmd.platform.machine)
+print("Kernel:  " + cmd.platform.version)
+print("Python:  " + cmd.platform.python)
+print("Host:    " + cmd.shell.hostname)
+print("User:    " + cmd.shell.user)
+print("Shell:   " + cmd.shell.path)
+print("Home:    " + cmd.home)
+print("CWD:     " + cmd.cwd)
+
+# --- Development Tools Audit ---
+divider("Development Tools Audit")
+let dev_tools = ["python3", "pip3", "node", "npm", "git", "make", "gcc", "java", "go", "rustc", "cargo"]
+let installed = 0
+let missing = 0
+
+for tool in dev_tools {
+    if check_cmd(tool) {
+        let installed = installed + 1
+    } else {
+        let missing = missing + 1
+    }
+}
+print("\nSummary: " + str(installed) + " installed, " + str(missing) + " missing")
+
+# --- System Utilities Audit ---
+divider("System Utilities Audit")
+let sys_tools = ["curl", "wget", "tar", "gzip", "ssh", "top", "ps", "df", "du", "netstat"]
+for tool in sys_tools {
+    let exists = check_cmd(tool)
+}
+
+# --- PATH Analysis ---
+divider("PATH Analysis")
+let path_dirs = cmd.path
+print("Total PATH entries: " + str(len(path_dirs)))
+let idx = 0
+for dir in path_dirs {
+    print("  [" + str(idx) + "] " + dir)
+    let idx = idx + 1
+}
+
+# --- Disk Space Check ---
+divider("Disk Space Check")
+let df_result = cmd.run("df -h / 2>/dev/null || df -h /", 10)
+if df_result.success {
+    print(df_result.stdout)
+} else {
+    print("Could not check disk space")
+}
+
+# --- Memory Check ---
+divider("Memory Check")
+if cmd.exists("vm_stat") {
+    let mem = cmd.run("vm_stat | head -10", 5)
+    print(mem.stdout)
+}
+
+# --- Network Check ---
+divider("Network Check")
+if cmd.exists("ifconfig") {
+    let net = cmd.run("ifconfig | grep -E '^[a-z]|inet ' | head -12", 5)
+    print(net.stdout)
+}
+
+# --- Running Processes (top 5 by CPU) ---
+divider("Top Processes")
+let ps_result = cmd.run("ps aux 2>/dev/null | sort -rnk 3 | head -6", 5)
+if ps_result.success {
+    print(ps_result.stdout)
+}
+
+# --- Environment Summary ---
+divider("Key Environment Variables")
+let keys = ["JAVA_HOME", "GOPATH", "NVM_DIR", "PYTHONPATH", "EDITOR", "LANG"]
+for key in keys {
+    let val = cmd.getenv(key)
+    if val != null {
+        print("  " + key + "=" + val)
+    } else {
+        print("  " + key + "=(not set)")
+    }
+}
+
+divider("Research Complete")
+print("System investigation finished successfully.")

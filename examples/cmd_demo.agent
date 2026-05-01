@@ -1,0 +1,77 @@
+# ===========================================
+# AFL System Command Research Demo
+# ===========================================
+
+print("=== 1. System Environment ===")
+print("Platform: " + cmd.platform.system + " " + cmd.platform.release)
+print("Machine: " + cmd.platform.machine)
+print("Python: " + cmd.platform.python)
+print("CWD: " + cmd.cwd)
+print("Home: " + cmd.home)
+print("Temp: " + cmd.tmpdir)
+
+print("\n=== 2. Shell Information ===")
+print("User: " + cmd.shell.user)
+print("Shell: " + cmd.shell.path)
+print("Hostname: " + cmd.shell.hostname)
+
+print("\n=== 3. PATH Directories (first 5) ===")
+let path_dirs = cmd.path
+let count = 0
+for dir in path_dirs {
+    if count < 5 {
+        print("  " + dir)
+        let count = count + 1
+    }
+}
+print("  ... (" + str(len(path_dirs)) + " total)")
+
+print("\n=== 4. Command Discovery ===")
+let targets = ["python3", "ls", "git", "docker", "node", "nonexistent_cmd"]
+for name in targets {
+    let exists = cmd.exists(name)
+    if exists {
+        let location = cmd.which(name)
+        let cmd_type = cmd.type(name)
+        print("  [FOUND] " + name + " -> " + location.path + " (" + cmd_type + ")")
+    } else {
+        print("  [MISS]  " + name + " - not found")
+    }
+}
+
+print("\n=== 5. Command Version Research ===")
+let research_cmds = ["python3", "git", "bash"]
+for name in research_cmds {
+    let ver = cmd.version(name)
+    if ver != "" {
+        print("  " + name + ": " + ver)
+    } else {
+        print("  " + name + ": (no version flag responded)")
+    }
+}
+
+print("\n=== 6. Command Execution ===")
+let result = cmd.run("echo 'Hello from AFL!'", 5)
+print("  exit_code: " + str(result.exit_code))
+print("  success: " + str(result.success))
+print("  duration: " + str(result.duration) + "s")
+print("  stdout: " + result.stdout)
+
+print("\n=== 7. Timeout Protection ===")
+print("  Running 'sleep 2' with 1s timeout...")
+let timed = cmd.run("sleep 2", 1)
+print("  exit_code: " + str(timed.exit_code))
+print("  success: " + str(timed.success))
+print("  stderr: " + timed.stderr)
+
+print("\n=== 8. Failed Command Handling ===")
+let bad = cmd.run("nonexistent_command_xyz 2>&1", 5)
+print("  exit_code: " + str(bad.exit_code))
+print("  success: " + str(bad.success))
+
+print("\n=== 9. ENV Variable Access ===")
+print("  SHELL=" + cmd.getenv("SHELL"))
+print("  USER=" + cmd.getenv("USER"))
+print("  HOME=" + cmd.getenv("HOME"))
+
+print("\n=== Cmd Research Demo Complete ===")

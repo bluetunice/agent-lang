@@ -1,0 +1,68 @@
+# 控制流测试
+
+print("=== 条件分支测试 ===")
+
+let score = 85
+
+if score >= 90 {
+    print("Grade: A")
+} elseif score >= 80 {
+    print("Grade: B")
+} elseif score >= 70 {
+    print("Grade: C")
+} else {
+    print("Grade: D")
+}
+
+# 三元表达式
+let result = if score >= 60 then "pass" else "fail"
+print("Result: " + result)
+
+let result2 = if score >= 90 then "excellent" else "good"
+print("Result2: " + result2)
+
+print("\n=== 循环测试 ===")
+
+# for range
+print("for range:")
+let sum1 = 0
+for i in range(5) {
+    print("i = " + str(i))
+    sum1 = sum1 + i
+}
+print("sum1 = " + str(sum1))
+
+# for list
+print("for list:")
+let items = [10, 20, 30]
+let sum2 = 0
+for item in items {
+    print("item = " + str(item))
+    sum2 = sum2 + item
+}
+print("sum2 = " + str(sum2))
+
+# while
+print("while:")
+let counter = 0
+let sum3 = 0
+while counter < 5 {
+    print("counter = " + str(counter))
+    sum3 = sum3 + counter
+    counter = counter + 1
+}
+print("sum3 = " + str(sum3))
+
+# break
+print("break test:")
+let break_sum = 0
+for i in range(10) {
+    if i >= 3 {
+        break
+    }
+    break_sum = break_sum + i
+    print("break i = " + str(i))
+}
+print("break_sum = " + str(break_sum))
+
+print("\n=== 所有控制流测试完成 ===")
